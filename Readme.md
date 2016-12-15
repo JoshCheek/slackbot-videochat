@@ -20,6 +20,10 @@ Chose "Initiate video chat from Slack" based on this criteria:
 * I could do a good job with my current knowledge (I've seen people integrate with each of these, and it didn't seem difficult)
 * Won't take much time (fewest moving pieces of the 3 final candidates)
 
+Additionally, Michael's feedback on the 3 possibilities:
+
+> The Dropbox to s3 looks cool, but video chat would probably look impressive. I think both would be good so choose the one that you're most excited about.
+
 
 User Story
 ----------
@@ -34,7 +38,8 @@ Mei: /videochat Jan
 Bot: Chat at http://videochat.example.com/j8n3fo1
 ```
 
-They each click the link and wind up in a hangout/facetime-like video chat.
+They each click the link and wind up in a hangout/facetime-like video chat
+where Mei and Jan sort out how to handle the client's situation.
 
 
 Expected procedure
@@ -48,3 +53,10 @@ Expected procedure
   except get rid of the chatroom, restrict participants to 2, and it looked like the example was 1
   person broadcasting, so we'll just need to do that two times.
 * How do you test this page? Uhm.... Mock out Twilio, maybe?
+
+---------------
+
+* 1 hour: Get the examples passing
+  3:43 - 4:43
+* 1 hour: Code the real chatbot
+* 2 hours: Twilio integration

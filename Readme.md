@@ -56,6 +56,6 @@ Expected procedure
 
 ---------------
 
-- [x] 1 hour: Get the examples passing (3:43 - 4:38)
+- [x] 1 hour: Get the examples passing (3:43 - 4:38) [video is here](https://www.livecoding.tv/joshcheek/videos/BM9mV-tell-me-what-to-code-killing-15-min-21)
 - [ ] 1 hour: Code the real chatbot
 - [ ] 2 hours: Twilio integration

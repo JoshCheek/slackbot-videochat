@@ -22,4 +22,12 @@ $ curl -i https://slackbot-example.herokuapp.com/gateway -d token=eExRyKtmi3TPoZ
 
 Make a slack webhook [here](https://slack.com/services/new/outgoing-webhook).
 
-![result](result.png)
+Or a slack slash command [here](https://my.slack.com/services/new/slash-commands).
+
+Outgoing webhook example:
+
+![result](result-outgoing-webhook.png)
+
+Slash Command example (to the echo server):
+
+![result](result-slash-command.png)

@@ -56,7 +56,6 @@ Expected procedure
 
 ---------------
 
-* 1 hour: Get the examples passing
-  3:43 - 4:43
-* 1 hour: Code the real chatbot
-* 2 hours: Twilio integration
+- [x] 1 hour: Get the examples passing (3:43 - 4:38)
+- [ ] 1 hour: Code the real chatbot
+- [ ] 2 hours: Twilio integration

@@ -12,6 +12,10 @@ get '/' do
   File.read(File.join('public', 'index.html'))
 end
 
+get '/debug' do
+  '<h1>works</h1>'
+end
+
 # Generate a token for use in our Video application
 get '/token' do
   # Create a random username for the client

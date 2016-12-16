@@ -1,7 +1,7 @@
-require_relative '../app'
+require 'slackbot_videochat_app'
 require 'rack/test'
 
-# The purpsoe is to support this interaction:
+# The purpose is to support this interaction:
 #
 # ```
 # Jan: Hey, Mei, how did the client meeting go?
@@ -18,7 +18,7 @@ TestInternetSession = Struct.new :app do
 end
 
 RSpec.describe 'Slack webhook' do
-  let(:internet) { TestInternetSession.new SlackbotVideochat }
+  let(:internet) { TestInternetSession.new SlackbotVideochatApp }
 
   # ideally a DM to each, but for now, just say it aloud
   it 'replies to slack with a the message for the users that tells them the url they can videochat at' do

@@ -1,7 +1,6 @@
 var videoClient;
 var activeRoom;
 var previewMedia;
-var roomName;
 var toDetach = [];
 
 // room.localParticipant

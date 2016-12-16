@@ -26,12 +26,12 @@ class SlackbotVideochat < Sinatra::Base
     File.read path
   end
 
-  get '/token' do
-    identity = 'username' # ideally, get this from slack
+  get '/videochats/:room' do
+    identity = 'username' # uhm, can we get this from slack?
     token = Twilio::Util::AccessToken.new key(:twilio, :account_sid),
                                           key(:twilio, :api_key),
                                           key(:twilio, :api_secret),
-                                          3600,
+                                          3600, # 1 hour
                                           identity
 
     # Grant access to Video
@@ -39,7 +39,11 @@ class SlackbotVideochat < Sinatra::Base
     grant.configuration_profile_sid = key(:twilio, :configuration_sid)
     token.add_grant grant
 
-    json :identity => identity, :token => token.to_jwt
+    @identity  = identity
+    @room_name = params[:room]
+    @token     = token.to_jwt
+
+    erb :'index.html'
   end
 
   # unlikely to be unique b/c it's a hash of the timestamp down to nanoseconds

@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 
 gem 'sinatra'
 gem 'sinatra-contrib'
-gem 'faker' # FIXME
 gem 'dotenv'
 gem 'twilio-ruby'
 

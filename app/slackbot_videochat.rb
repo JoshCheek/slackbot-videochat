@@ -1,15 +1,9 @@
 require 'sinatra/base'
-require 'json'
-require 'digest/md5'
-
-require 'twilio-ruby'
-require 'sinatra'
 require 'sinatra/json'
-require 'faker'
+require 'digest/md5'
+require 'twilio-ruby'
 
 class SlackbotVideochat < Sinatra::Base
-  set :root, File.dirname(__dir__)
-
   # Whenever someone says 'videochat: username-to-chat-with'
   # Slack posts to this url (see test for keys)
   # I'm not sure where the docs are for more interesting responses -.-
@@ -18,21 +12,16 @@ class SlackbotVideochat < Sinatra::Base
     json text: "Chat at #{url}"
   end
 
-  # ...uhhhh
-  get '/:file.:ext' do
-    content_type params[:ext]
-    filename = "#{params[:file]}.#{params[:ext]}"
-    path     = File.join settings.views, filename
-    File.read path
-  end
-
   get '/videochats/:room' do
     identity = 'username' # uhm, can we get this from slack?
-    token = Twilio::Util::AccessToken.new key(:twilio, :account_sid),
-                                          key(:twilio, :api_key),
-                                          key(:twilio, :api_secret),
-                                          3600, # 1 hour
-                                          identity
+
+    token = Twilio::Util::AccessToken.new(
+      key(:twilio, :account_sid),
+      key(:twilio, :api_key),
+      key(:twilio, :api_secret),
+      3600, # 1 hour
+      identity
+    )
 
     # Grant access to Video
     grant = Twilio::Util::AccessToken::VideoGrant.new
@@ -43,7 +32,7 @@ class SlackbotVideochat < Sinatra::Base
     @room_name = params[:room]
     @token     = token.to_jwt
 
-    erb :'index.html'
+    erb :videochat
   end
 
   # unlikely to be unique b/c it's a hash of the timestamp down to nanoseconds

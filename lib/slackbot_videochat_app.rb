@@ -8,7 +8,7 @@ class SlackbotVideochatApp < Sinatra::Base
   # I'm not sure where the docs are for more interesting responses -.-
   post '/videochats' do
     content_type :json
-    url   = File.join request.url, unique_token
+    url = File.join request.url, unique_token
     {text: "Chat at #{url}"}.to_json
   end
 

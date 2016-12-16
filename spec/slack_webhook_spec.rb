@@ -22,7 +22,8 @@ RSpec.describe 'Slack webhook' do
 
   # ideally a DM to each, but for now, just say it aloud
   it 'replies to slack with a the message for the users that tells them the url they can videochat at' do
-    # posted to us from Slack
+    # posted to us from Slack,  for slash commands, we get these two instead of trigger_word:
+    # {command: "videochat:", response_url: "https://hooks.slack.com/commands/idk/idk/idk"}
     response = internet.post '/videochats', {
       token:        "test-token",
       team_id:      "test-team-id",
@@ -30,10 +31,10 @@ RSpec.describe 'Slack webhook' do
       channel_id:   "test-channel-id",
       channel_name: "josh-test-channel-name",
       user_id:      "test-user-id",
+      timestamp:    '1355517523.000005',
       user_name:    "username1",
-      command:      "videochat:",
-      text:         "username2",
-      response_url: "https://hooks.slack.com/commands/idk/idk/idk",
+      text:         "videochat: username2",
+      trigger_word: "videochat:",
     }
 
     expect(response).to be_successful

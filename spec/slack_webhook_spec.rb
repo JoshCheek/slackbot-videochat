@@ -20,12 +20,8 @@ end
 RSpec.describe 'Slack webhook' do
   let(:internet) { TestInternetSession.new SlackbotVideochatApp }
 
-  # ideally a DM to each, but for now, just say it aloud
-  it 'replies to slack with a the message for the users that tells them the url they can videochat at' do
-    # posted to us from Slack,  for slash commands, we get these two instead of trigger_word:
-    # {command: "videochat:", response_url: "https://hooks.slack.com/commands/idk/idk/idk"}
-    response = internet.post '/videochats', {
-      token:        "test-token",
+  def slack_params
+    { token:        "test-token",
       team_id:      "test-team-id",
       team_domain:  "test-team-domain",
       channel_id:   "test-channel-id",
@@ -36,14 +32,37 @@ RSpec.describe 'Slack webhook' do
       text:         "videochat: username2",
       trigger_word: "videochat:",
     }
+  end
 
+  def extract_body(response)
     expect(response).to be_successful
     body = JSON.parse response.body
     expect(body.keys).to eq ['text']
+    body
+  end
+
+  # ideally a DM to each, but for now, just say it aloud
+  it 'replies to slack with a the message for the users that tells them the url they can videochat at' do
+    # posted to us from Slack,  for slash commands, we get these two instead of trigger_word:
+    # {command: "videochat:", response_url: "https://hooks.slack.com/commands/idk/idk/idk"}
+    response = internet.post '/videochats', slack_params
+    body     = extract_body response
     expect(body['text']).to start_with 'Chat at http://example.org/videochats'
   end
 
-  describe 'the videochat url' do
+  describe 'Generating a videochat url' do
+    it 'is on the current host' do
+      response = internet.post('http://1.example.org/videochats', slack_params)
+      body     = extract_body response
+      url      = body['text'].split.last
+      expect(url).to start_with 'http://1.example.org'
+
+      response = internet.post('http://2.example.org/videochats', slack_params)
+      body     = extract_body response
+      url      = body['text'].split.last
+      expect(url).to start_with 'http://2.example.org'
+    end
+
     it 'uses a random endpoint'
   end
 end

@@ -1,66 +1,43 @@
 <!DOCTYPE html>
-<html>
+
 <head>
   <title>Slackbot Videochat</title>
-  <link rel="stylesheet" href="site.css">
 </head>
-<body>
-  <div id="remote-media"></div>
-  <div id="controls">
-    <div id="preview">
-      <p class="instructions">Hello Beautiful</p>
-      <div id="local-media"></div>
-      <button id="button-preview">Preview My Camera</button>
-    </div>
-    <div id="room-controls">
-      <p class="instructions">Room Name:</p>
-      <input id="room-name" type="text" placeholder="Enter a room name" />
-      <button id="button-join">Join Room</button>
-      <button id="button-leave">Leave Room</button>
-    </div>
-    <div id="log"></div>
-  </div>
 
-  <script src="//media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-</body>
-</html>
+<div id="remote-media"></div>
+<div id="local-media"></div>
+
+<!--
+  Would be nice to have controls to
+  pause / mute / disconnect for self and other
+-->
+
+<script src="//media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
 <script>
-// do they escape erb values by default in Sinatra?
+// TODO: do they escape erb values by default in Sinatra?
 var identity = "<%= @identity %>"
 var roomName = "<%= @room_name %>"
 var token    = "<%= @token %>"
 
-// room.localParticipant
-// participant.identity
-// participant.media
-// media.attach(div)
-// media.detach()
-// room.disconnect()
-
 // Check for WebRTC
 if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
   alert('WebRTC is not available in your browser.');
+} else {
+  var videoClient = new Twilio.Video.Client(token);
+  videoClient.connect({to: roomName})
+    .then(roomJoined, function(e) { alert(e.toString()) })
+
+  var previewMedia = new Twilio.Video.LocalMedia();
+  Twilio.Video.getUserMedia().then(
+    function(mediaStream) {
+      previewMedia.addStream(mediaStream);
+      previewMedia.attach('#local-media');
+    },
+    function(error) { alert(error.toString()) }
+  )
 }
-
-window.addEventListener('beforeunload', function() {
-  activeRoom && activeRoom.disconnect()
-});
-
-var videoClient = new Twilio.Video.Client(token);
-document.getElementById('room-controls').style.display = 'block'; // TODO: move to CSS
-videoClient.connect({to: roomName})
-  .then(roomJoined, function(e) { alert(e.toString()) })
-
-var previewMedia = new Twilio.Video.LocalMedia();
-Twilio.Video.getUserMedia().then(
-  function(mediaStream) {
-    previewMedia.addStream(mediaStream);
-    previewMedia.attach('#local-media');
-  },
-  function(error) { alert(error.toString()) }
-)
 
 function roomJoined(room) {
   room.participants.forEach(attachOther)          // they join first
@@ -69,6 +46,10 @@ function roomJoined(room) {
     participant.media.detach() // what would happen if we didn't?
   });
   room.on('disconnected', function () { })
+
+  window.addEventListener('beforeunload', function() {
+    room.disconnect()
+  })
 }
 
 function attachOther(participant) {

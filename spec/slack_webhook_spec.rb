@@ -63,6 +63,10 @@ RSpec.describe 'Slack webhook' do
       expect(url).to start_with 'http://2.example.org'
     end
 
-    it 'uses a random endpoint'
+    it 'uses a random endpoint' do
+      r1 = internet.post('/videochats', slack_params)
+      r2 = internet.post('/videochats', slack_params)
+      expect(r1.body).to_not eq r2.body
+    end
   end
 end

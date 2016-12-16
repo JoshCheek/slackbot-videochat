@@ -1,42 +1,29 @@
-require 'sinatra'
-require 'httparty'
+require 'sinatra/base'
 require 'json'
 
 # Whenever someone says the slash command,
 # Slack posts to my url with (not quite this):
-#   -d token=eExRyKtmi3TPoZJM6NcbELvm
-#   -d team_id=T0001
-#   -d team_domain=example
-#   -d channel_id=C2147483705
-#   -d channel_name=test
-#   -d timestamp=1355517523.000005
-#   -d user_id=U2147483697
-#   -d user_name=Steve
-#   -d 'text=giubot: issues _ twbs/bootstrap'
-#   -d 'trigger_word=giubot:'
+#
+# slash-command BOT [5:40 PM] Only visible to you
+# { "token"=>"y06fTupQI3TjuNFeuP3jk2hL",
+#   "team_id"=>"T3BS49M8A",
+#   "team_domain"=>"module5",
+#   "channel_id"=>"C3FDDV63V",
+#   "channel_name"=>"josh-testing",
+#   "user_id"=>"U3G2NE4MC",
+#   "user_name"=>"paddington",
+#   "command"=>"/guibot",
+#   "text"=>"hello",
+#   "response_url"=>"https://hooks.slack.com/commands/T3BS49M8A/117638796020/AeIqmup9bWRYueY7I5OEkQo1"
+# }
 #
 # Respond with {text: 'some text'}
 #   I'm not sure where the docs are for more interesting responses -.-
 
-
-# !!Copied straight from the example, no attempt made to even run it!!
-class SlackbotVideochat
-  post '/gateway' do
-    message = params[:text].gsub(params[:trigger_word], '').strip
-
-    action, repo = message.split('_').map {|c| c.strip.downcase }
-    repo_url = "https://api.github.com/repos/#{repo}"
-
-    case action
-    when 'issues'
-      resp = HTTParty.get(repo_url)
-      resp = JSON.parse resp.body
-      respond_message "There are #{resp['open_issues_count']} open issues on #{repo}"
-    end
-  end
-
-  def respond_message message
+class SlackbotVideochat < Sinatra::Base
+  post '/videochats' do
     content_type :json
-    {:text => message}.to_json
+    url = 'http://example.org/videochats/123'
+    {text: "Chat at #{url}"}.to_json
   end
 end

@@ -23,8 +23,15 @@ let participants = [
   newParticipant('c'),
 ]
 let state = { type: "mediaList", list: participants }
+
+function setFeatured(participant) {
+  participants.forEach(p => p.featured = false)
+  participant.featured = true
+  // somehow force rerender
+}
+
 ReactDOM.render(
-  <App state={state}/>,
+  <App state={state} setFeatured={setFeatured}/>,
   document.getElementById('root')
 );
 

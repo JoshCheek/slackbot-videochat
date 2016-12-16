@@ -1,13 +1,10 @@
 require 'sinatra/base'
 require 'json'
 
-# Whenever someone says the slash command,
-# Slack posts to my url with (not quite this):
-#
-# Respond with {text: 'some text'}
-#   I'm not sure where the docs are for more interesting responses -.-
-
 class SlackbotVideochatApp < Sinatra::Base
+  # Whenever someone says 'videochat: username-to-chat-with'
+  # Slack posts to this url (see test for keys)
+  # I'm not sure where the docs are for more interesting responses -.-
   post '/videochats' do
     content_type :json
     url = 'http://example.org/videochats/123'

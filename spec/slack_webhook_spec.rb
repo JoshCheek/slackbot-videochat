@@ -7,7 +7,7 @@ require 'rack/test'
 # Jan: Hey, Mei, how did the client meeting go?
 # Mei: Too complicated to express in text, want to talk about it over lunch?
 # Jan: Can't, I'm WFH, videochat?
-# Mei: /videochat Jan
+# Mei: videochat: Jan
 # Bot: Chat at http://videochat.example.com/j8n3fo1
 # ```
 #

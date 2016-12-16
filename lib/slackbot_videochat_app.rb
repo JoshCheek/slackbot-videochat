@@ -1,12 +1,15 @@
 require 'sinatra/base'
 require 'json'
 require 'digest/md5'
+require 'pp'
 
 class SlackbotVideochatApp < Sinatra::Base
   # Whenever someone says 'videochat: username-to-chat-with'
   # Slack posts to this url (see test for keys)
   # I'm not sure where the docs are for more interesting responses -.-
   post '/videochats' do
+    puts '-------- REQUEST ----------'
+    pp params
     content_type :json
     url = File.join request.url, unique_token
     {text: "Chat at #{url}"}.to_json

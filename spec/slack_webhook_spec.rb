@@ -1,4 +1,5 @@
-require 'slackbot_videochat_app'
+$LOAD_PATH.unshift File.expand_path('../app', __dir__)
+require 'slackbot_videochat'
 require 'rack/test'
 
 # The purpose is to support this interaction:
@@ -18,7 +19,7 @@ TestInternetSession = Struct.new :app do
 end
 
 RSpec.describe 'Slack webhook' do
-  let(:internet) { TestInternetSession.new SlackbotVideochatApp }
+  let(:internet) { TestInternetSession.new SlackbotVideochat }
 
   def slack_params
     { token:        "test-token",

@@ -2,7 +2,7 @@ require 'sinatra/base'
 require 'json'
 require 'digest/md5'
 
-class SlackbotVideochatApp < Sinatra::Base
+class SlackbotVideochat < Sinatra::Base
   # Whenever someone says 'videochat: username-to-chat-with'
   # Slack posts to this url (see test for keys)
   # I'm not sure where the docs are for more interesting responses -.-

@@ -59,7 +59,6 @@ Expected procedure
 - [x] 1 hour: Get the examples passing [video is here](https://www.livecoding.tv/joshcheek/videos/BM9mV-tell-me-what-to-code-killing-15-min-21)
 - [x] 1 hour: Code the real chatbot [video is here](https://www.livecoding.tv/joshcheek/videos/GvWmn-tell-me-what-to-code-killing-15-min-25)
 - [ ] 2 hours: Twilio integration
-  - [ ] Update Twilio example to latest client
   - [ ] Spike it onto my app
   - [ ] Look at how they tested the client, do we do what they did or do we use react?
     * If React

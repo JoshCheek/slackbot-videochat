@@ -1,28 +1,5 @@
 import React, { Component } from 'react'
-import logo from './logo.svg'
 import './App.css'
-
-class FeaturedMedia extends Component {
-  render() {
-    return <Participant participant={this.props.participant} />
-  }
-}
-
-class Participant extends Component {
-  render() {
-    return <div className="Featured">
-      {this.props.participant.identity}
-    </div>
-  }
-}
-
-class MediaGrid extends Component {
-  render() {
-    console.log(this.props.participants)
-    const media = this.props.participants.map(p => <Participant participant={p} />)
-    return <div className="Participants">{media}</div>
-  }
-}
 
 class App extends Component {
   render() {
@@ -36,6 +13,30 @@ class App extends Component {
 
   nullParticipant() {
     return { identity: '', media: 'null media', connected: false }
+  }
+}
+
+
+class FeaturedMedia extends Component {
+  render() {
+    return <div className="Featured">
+      <Media participant={this.props.participant} />
+    </div>
+  }
+}
+
+class MediaGrid extends Component {
+  render() {
+    console.log(this.props.participants)
+    const media = this.props.participants.map(p => <Media key={p.identity} participant={p} />)
+    return <div className="Participants">{media}</div>
+  }
+}
+
+class Media extends Component {
+  render() {
+    const url = this.props.participant.media.url
+    return <img className="media" src={url} />
   }
 }
 

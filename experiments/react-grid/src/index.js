@@ -6,7 +6,9 @@ import './index.css';
 function newMedia(identity) {
   // figure out what this thing should look like
   // probably an attach and detach method
-  return `Media for ${identity}`
+  return {
+    url: `https://dummyimage.com/320x240/000000/ffffff?text=${identity}`
+  }
 }
 
 function newParticipant(identity) {
@@ -18,9 +20,9 @@ function newParticipant(identity) {
 }
 
 let participants = [
-  newParticipant('a'),
-  newParticipant('b'),
-  newParticipant('c'),
+  newParticipant('Wilma Washington'),
+  newParticipant('Janet Jensen'),
+  newParticipant('Charlie Chaplain'),
 ]
 let state = { type: "mediaList", list: participants }
 

@@ -8,11 +8,12 @@ class SlackbotVideochatApp < Sinatra::Base
   # I'm not sure where the docs are for more interesting responses -.-
   post '/videochats' do
     content_type :json
-    # unlikely to be unique b/c it includes timestamp down to nanoseconds
-    time  = Time.new
-    seed  = time.strftime("%F%H%M%9N")
-    token = Digest::MD5.hexdigest seed
-    url   = File.join request.url, token
+    url   = File.join request.url, unique_token
     {text: "Chat at #{url}"}.to_json
+  end
+
+  # unlikely to be unique b/c it's a hash of the timestamp down to nanoseconds
+  def unique_token
+    Digest::MD5.hexdigest Time.new.strftime("%F%H%M%9N")
   end
 end

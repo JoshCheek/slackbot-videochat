@@ -37,6 +37,7 @@ RSpec.describe 'Slack webhook' do
 
   def extract_body(response)
     expect(response).to be_successful
+    expect(response.content_type).to eq 'application/json'
     body = JSON.parse response.body
     expect(body.keys).to eq ['text']
     body

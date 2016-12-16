@@ -14,11 +14,11 @@ class SlackbotVideochat < Sinatra::Base
   # Slack posts to this url (see test for keys)
   # I'm not sure where the docs are for more interesting responses -.-
   post '/videochats' do
-    content_type :json
     url = File.join request.url, unique_token
-    {text: "Chat at #{url}"}.to_json
+    json text: "Chat at #{url}"
   end
 
+  # ...uhhhh
   get '/:file.:ext' do
     content_type params[:ext]
     filename = "#{params[:file]}.#{params[:ext]}"

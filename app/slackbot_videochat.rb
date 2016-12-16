@@ -5,12 +5,8 @@ require 'digest/md5'
 require 'twilio-ruby'
 require 'sinatra'
 require 'sinatra/json'
-require 'dotenv'
 require 'faker'
 
-
-
-Dotenv.load
 class SlackbotVideochat < Sinatra::Base
   set :root, File.dirname(__dir__)
 
@@ -31,12 +27,16 @@ class SlackbotVideochat < Sinatra::Base
   end
 
   get '/token' do
-    identity = Faker::Internet.user_name
-    token    = Twilio::Util::AccessToken.new ENV['TWILIO_ACCOUNT_SID'], ENV['TWILIO_API_KEY'], ENV['TWILIO_API_SECRET'], 3600, identity
+    identity = 'username' # ideally, get this from slack
+    token = Twilio::Util::AccessToken.new key(:twilio, :account_sid),
+                                          key(:twilio, :api_key),
+                                          key(:twilio, :api_secret),
+                                          3600,
+                                          identity
 
     # Grant access to Video
     grant = Twilio::Util::AccessToken::VideoGrant.new
-    grant.configuration_profile_sid = ENV['TWILIO_CONFIGURATION_SID']
+    grant.configuration_profile_sid = key(:twilio, :configuration_sid)
     token.add_grant grant
 
     json :identity => identity, :token => token.to_jwt
@@ -45,5 +45,9 @@ class SlackbotVideochat < Sinatra::Base
   # unlikely to be unique b/c it's a hash of the timestamp down to nanoseconds
   def unique_token
     Digest::MD5.hexdigest Time.new.strftime("%F%H%M%9N")
+  end
+
+  def key(scope, name)
+    env.fetch(:keys).fetch(scope).fetch(name)
   end
 end

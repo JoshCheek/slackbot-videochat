@@ -29,7 +29,7 @@ class FeaturedMedia extends Component {
 
 class MediaList extends Component {
   render() {
-    console.log(this.props.participants)
+    // console.log(this.props.participants)
     const media = this.props.participants.map(p =>
       <Media key={p.identity} participant={p} setFeatured={this.props.setFeatured}/>
     )

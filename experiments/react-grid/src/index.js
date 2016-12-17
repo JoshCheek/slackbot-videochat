@@ -3,39 +3,43 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import './index.css';
 
-function newMedia(identity) {
+function newMedia(name) {
   // figure out what this thing should look like
   // probably an attach and detach method
   return {
-    url: `https://dummyimage.com/320x240/000000/ffffff?text=${identity}`
+    url: `/${name}.jpg`
   }
 }
 
-function newParticipant(identity) {
+function newParticipant(id, name) {
   return {
-    identity:  identity,
-    media:     newMedia(identity),
+    identity:  id,
+    media:     newMedia(name),
     connected: true,
   }
 }
 
 let participants = [
-  newParticipant('Wilma Washington'),
-  newParticipant('Janet Jensen'),
-  newParticipant('Charlie Chaplain'),
+  newParticipant(1, 'josh-ren'),
+  newParticipant(2, 'josh-pumpkin'),
+  newParticipant(3, 'josh-ren-blu'),
+  // newParticipant(4, 'josh-ren-blu'),
+  // newParticipant(5, 'josh-ren-blu'),
+  // newParticipant(6, 'josh-ren-blu'),
 ]
 let state = { type: "mediaList", list: participants }
+
+const dom = ReactDOM.render(
+  <App state={state} setFeatured={setFeatured}/>,
+  document.getElementById('root')
+);
 
 function setFeatured(participant) {
   participants.forEach(p => p.featured = false)
   participant.featured = true
-  // somehow force rerender
+  dom.forceUpdate()
 }
 
-ReactDOM.render(
-  <App state={state} setFeatured={setFeatured}/>,
-  document.getElementById('root')
-);
 
 // maybe something like this:
 

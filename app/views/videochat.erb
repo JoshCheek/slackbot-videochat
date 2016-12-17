@@ -28,18 +28,10 @@ if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
   var videoClient = new Twilio.Video.Client(token);
   videoClient.connect({to: roomName})
     .then(roomJoined, function(e) { alert(e.toString()) })
-
-  var previewMedia = new Twilio.Video.LocalMedia();
-  Twilio.Video.getUserMedia().then(
-    function(mediaStream) {
-      previewMedia.addStream(mediaStream);
-      previewMedia.attach('#local-media');
-    },
-    function(error) { alert(error.toString()) }
-  )
 }
 
 function roomJoined(room) {
+  room.localParticipant.media.attach('#local-media');
   room.participants.forEach(attachOther)          // they join first
   room.on('participantConnected',    attachOther) // they join second
   room.on('participantDisconnected', function (participant) {

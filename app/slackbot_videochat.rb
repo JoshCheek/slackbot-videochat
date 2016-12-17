@@ -37,7 +37,9 @@ class SlackbotVideochat < Sinatra::Base
 
   # unlikely to be unique b/c it's a hash of the timestamp down to nanoseconds
   def unique_token
-    Digest::MD5.hexdigest Time.new.strftime("%F%H%M%9N")
+    time = Time.new.strftime("%F%H%M%9N")
+    b64  = Digest::MD5.base64digest(time)
+    b64[0...-2] # remove trailing equal signs (they're ugly)
   end
 
   def key(scope, name)

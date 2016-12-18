@@ -12,6 +12,11 @@ class SlackbotVideochat < Sinatra::Base
     json text: "Chat at #{url}"
   end
 
+  get '/main.js' do
+    glob = File.expand_path('../build/static/js/main*.js', __dir__)
+    send_file Dir[glob].first
+  end
+
   get '/videochats/:room' do
     identity = 'username' # uhm, can we get this from slack?
 

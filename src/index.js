@@ -1,43 +1,66 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import './index.css';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import App from './App'
+import './index.css'
 
-function newMedia(name) {
-  // figure out what this thing should look like
-  // probably an attach and detach method
-  return {
-    url: `https://dummyimage.com/320x240/000000/ffffff?text=${name}`
-  }
+// pull it from public b/c it's broken on node w/ react
+// https://github.com/twilio/twilio-video.js/issues/28
+import TwilioVideo from '../public/twilio-video.min.js'
+
+const identity = "??"
+const roomName = "??"
+const token    = "??"
+
+if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
+  // No dice
+  alert('WebRTC is not available in your browser.');
+} else {
+  // Lets do it!
+  new TwilioVideo.Client(token)
+    .connect({to: roomName})
+    .then(roomJoined, function(e) { alert(e.toString()) })
 }
 
-function newParticipant(id, name) {
-  return {
-    identity:  id,
-    media:     newMedia(name),
-    connected: true,
+
+function roomJoined(room) {
+  let participants = [room.localParticipant, ...room.participants]
+
+  // do we put them in the DOM here or do we pass them to react?
+  let state = { type: "mediaList", list: participants }
+  const dom = ReactDOM.render(
+    <App state={state} setFeatured={setFeatured}/>,
+    document.getElementById('root')
+  )
+
+  room.on('participantConnected', function(participant) {
+    // add to participants and rerender
+  })
+
+  room.on('participantDisconnected', function (participant) {
+    // instead, push this down into media,
+    // remove it from our participants list here and then render again
+    // participant.media.detach()
+  });
+
+  room.on('disconnected', function () {
+    // ideally do something nice here, realistically this was supposed to be a 4 hr project
+  })
+
+  window.addEventListener('beforeunload', function() {
+    // I thiiiiiink this is called when you leave the page, MDN docs don't tell you when unload is called,
+    // but they give an example that involves leaving a page:
+    // https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
+    //
+    // Not sure why we need to disconnect, maybe to differentiate it from an interrupted connection
+    // so that the other side dosn't think we might come back?
+    room.disconnect()
+  })
+
+  function setFeatured(participant) {
+    participants.forEach(p => p.featured = false)
+    participant.featured = true
+    dom.forceUpdate()
   }
-}
-
-let participants = [
-  newParticipant(1, 'josh-ren'),
-  newParticipant(2, 'josh-pumpkin'),
-  newParticipant(3, 'josh-ren-blu'),
-  // newParticipant(4, 'josh-ren-blu'),
-  // newParticipant(5, 'josh-ren-blu'),
-  // newParticipant(6, 'josh-ren-blu'),
-]
-let state = { type: "mediaList", list: participants }
-
-const dom = ReactDOM.render(
-  <App state={state} setFeatured={setFeatured}/>,
-  document.getElementById('root')
-);
-
-function setFeatured(participant) {
-  participants.forEach(p => p.featured = false)
-  participant.featured = true
-  dom.forceUpdate()
 }
 
 

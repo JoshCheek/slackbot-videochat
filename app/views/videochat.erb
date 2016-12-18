@@ -1,50 +1,12 @@
 <!DOCTYPE html>
 
-<head>
-  <title>Slackbot Videochat</title>
-</head>
+<html lang="en">
+  <head>
+    <title>Slackbot Videochat</title>
+  </head>
 
-<div id="remote-media"></div>
-<div id="local-media"></div>
+  <div id="root"></div>
+  <script src="/main.js"></script>
 
-<!--
-  Would be nice to have controls to
-  pause / mute / disconnect for self and other
--->
-
-<script src="//media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-
-<script>
-// TODO: do they escape erb values by default in Sinatra?
-var identity = "<%= @identity %>"
-var roomName = "<%= @room_name %>"
-var token    = "<%= @token %>"
-
-// Check for WebRTC
-if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
-  alert('WebRTC is not available in your browser.');
-} else {
-  var videoClient = new Twilio.Video.Client(token);
-  videoClient.connect({to: roomName})
-    .then(roomJoined, function(e) { alert(e.toString()) })
-}
-
-function roomJoined(room) {
-  room.localParticipant.media.attach('#local-media');
-  room.participants.forEach(attachOther)          // they join first
-  room.on('participantConnected',    attachOther) // they join second
-  room.on('participantDisconnected', function (participant) {
-    participant.media.detach() // what would happen if we didn't?
-  });
-  room.on('disconnected', function () { })
-
-  window.addEventListener('beforeunload', function() {
-    room.disconnect()
-  })
-}
-
-function attachOther(participant) {
-  participant.media.attach('#remote-media')
-}
-</script>
+  <script src="//media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
+</html>

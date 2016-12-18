@@ -23,25 +23,42 @@
   // TODO: This needs to be escaped
   var roomName = "<%= @room_name %>"
   var token    = "<%= @token %>"
+  var devmode  = ('dev' === roomName)
 
   if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
     alert('WebRTC is not available in your browser.');
   } else {
-    new Twilio.Video.Client(token)
-      .connect({to: roomName})
-      .then(roomJoined, function(e) { alert(e.toString()) })
+    var client = new Twilio.Video.Client(token)
+    if (devmode)
+      mockConnection(client)
+    else
+      client.connect({to: roomName})
+            .then(roomJoined, function(e) { alert(e.toString()) })
+  }
+
+  function mockConnection(client) {
+    var noop = function() {}
+    var me = {
+      identity: 'developer',
+      media:    new Twilio.Video.LocalMedia(),
+      featured: false,
+    }
+    Twilio.Video.getUserMedia().then(function(stream) {
+      me.media.addStream(stream)
+    })
+    roomJoined({participants: [me], localParticipant: me, on: noop, disconnect: noop})
   }
 
 
   function roomJoined(room) {
-    let participants = [room.localParticipant]
+    var participants = [room.localParticipant]
     room.participants.forEach(function(p) { participants.push(p) })
 
     // currently state is always "mediaList", but if we were to keep going with this
     // we would want it to be able to pass in things like erorr states
-    let state = { type: "mediaList", list: participants }
+    var state = { type: "mediaList", list: participants }
 
-    const dom = ReactDOM.render(
+    var dom = ReactDOM.render(
       React.createElement(App, { state: state, setFeatured: setFeatured }), // equivalent to <App state={state} setFeatured={setFeatured} />
       document.getElementById('root')
     )

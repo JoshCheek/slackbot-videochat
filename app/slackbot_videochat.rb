@@ -4,8 +4,8 @@ require 'digest/md5'
 require 'twilio-ruby'
 
 class SlackbotVideochat < Sinatra::Base
-  repo_root = File.expand_path '..', __dir__
-  set :public_folder, File.join(repo_root, 'public')
+
+  get('/') { redirect '/videochats/dev' } if ENV['RACK_ENV'] == 'development'
 
   # Whenever someone says 'videochat: username-to-chat-with'
   # Slack posts to this url (see test for keys)
@@ -15,15 +15,12 @@ class SlackbotVideochat < Sinatra::Base
     json text: "Chat at #{url}"
   end
 
-  get '/main.js' do
-    glob = File.expand_path('../build/static/js/main*.js', __dir__)
-    send_file Dir[glob].first
-  end
-
   get '/videochats/:room' do
-    identity = 'username' # uhm, can we get this from slack?
+    # Ideally we could use their name from Slack
+    # probably not possible, for now we'll just give them a random unique value
+    identity = unique_token
 
-    token = Twilio::Util::AccessToken.new(
+    user = Twilio::Util::AccessToken.new(
       key(:twilio, :account_sid),
       key(:twilio, :api_key),
       key(:twilio, :api_secret),
@@ -34,11 +31,11 @@ class SlackbotVideochat < Sinatra::Base
     # Grant access to Video
     grant = Twilio::Util::AccessToken::VideoGrant.new
     grant.configuration_profile_sid = key(:twilio, :configuration_sid)
-    token.add_grant grant
+    user.add_grant grant
 
     @identity  = identity
     @room_name = params[:room]
-    @token     = token.to_jwt
+    @token     = user.to_jwt
 
     erb :videochat
   end

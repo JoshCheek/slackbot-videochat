@@ -5,14 +5,7 @@
     <title>Slackbot Videochat</title>
   </head>
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-    }
-  </style>
-
+  <link href="/main.css" rel="stylesheet">
   <div id="root"></div>
 
   <!-- pull it from public b/c it's broken on node w/ react -->
@@ -23,6 +16,9 @@
 
   <script>
   "use strict"
+
+  // TODO: do those script tags execute asynchronously?
+  // this code might need to be in an "on dom ready" thing
 
   // TODO: This needs to be escaped
   var roomName = "<%= @room_name %>"
@@ -38,7 +34,8 @@
 
 
   function roomJoined(room) {
-    let participants = [room.localParticipant, ...room.participants]
+    let participants = [room.localParticipant]
+    room.participants.forEach(function(p) { participants.push(p) })
 
     // currently state is always "mediaList", but if we were to keep going with this
     // we would want it to be able to pass in things like erorr states

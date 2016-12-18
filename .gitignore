@@ -1,2 +1,4 @@
 .env
 tmp
+node_modules
+build

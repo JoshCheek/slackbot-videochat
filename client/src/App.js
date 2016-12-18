@@ -29,7 +29,6 @@ class FeaturedMedia extends Component {
 
 class MediaList extends Component {
   render() {
-    // console.log(this.props.participants)
     const media = this.props.participants.map(p =>
       <Media key={p.identity} participant={p} setFeatured={this.props.setFeatured}/>
     )
@@ -40,11 +39,9 @@ class MediaList extends Component {
 class Media extends Component {
   render() {
     const participant = this.props.participant
-    const url = participant.media.url
-
     return <div
       className="Media"
-      ref={(div) => console.log({attachedTo: participant.media.attach(div)}) }
+      ref={(div) => participant.media.attach(div)}
       onClick={() => this.props.setFeatured(participant)}
     />
   }

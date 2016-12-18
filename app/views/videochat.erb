@@ -5,14 +5,14 @@
     <title>Slackbot Videochat</title>
   </head>
 
-  <link href="/main.css" rel="stylesheet">
+  <link href="/main.css?cache=false" rel="stylesheet">
   <div id="root"></div>
 
   <!-- pull it from public b/c it's broken on node w/ react -->
   <!-- https://github.com/twilio/twilio-video.js/issues/28  -->
   <script src="//media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
 
-  <script src="/main.js"></script>
+  <script src="/main.js?cache=false"></script>
 
   <script>
   "use strict"
@@ -25,34 +25,57 @@
   var token    = "<%= @token %>"
   var devmode  = ('dev' === roomName)
 
-  if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
+  if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia)
     alert('WebRTC is not available in your browser.');
-  } else {
-    var client = new Twilio.Video.Client(token)
-    if (devmode)
-      mockConnection(client)
-    else
-      client.connect({to: roomName})
-            .then(roomJoined, function(e) { alert(e.toString()) })
-  }
+  else if (devmode)
+    mockRoom(true).then(roomJoined)
+  else
+    new Twilio.Video.Client(token)
+      .connect({to: roomName})
+      .then(roomJoined, function(e) { alert(e.toString()) })
 
-  function mockConnection(client) {
-    var noop = function() {}
-    var me = {
-      identity: 'developer',
-      media:    new Twilio.Video.LocalMedia(),
-      featured: false,
+  function mockRoom(useTwilio) {
+    var noop    = function() {}
+    var me      = { identity: me, featured: false }
+    var promise = null
+
+    // Maybe it's a bug in Opera, but even when I swap out and don't use Twilio at all,
+    // it shots my processor through the roof, even after I close the page :(
+    if (useTwilio) {
+      me.media = new Twilio.Video.LocalMedia()
+      promise  = Twilio.Video.getUserMedia().then(function(stream) {
+        me.media.addStream(stream)
+        // me.media.pause() // For some reason, it's really taxing my processor, so pause it
+      })
+    } else {
+      promise = navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(function(stream) {
+        me.media = {attach: function(parent) {
+          var video = document.createElement("video")
+          video.height = 100
+          video.srcObject = stream
+          parent.appendChild(video)
+          video.onloadedmetadata = function(e) { /* video.play() */ }
+        }}
+      })
     }
-    Twilio.Video.getUserMedia().then(function(stream) {
-      me.media.addStream(stream)
+
+    return promise.then(function() {
+      return { participants: [], localParticipant: me, on: noop, disconnect: noop }
     })
-    roomJoined({participants: [me], localParticipant: me, on: noop, disconnect: noop})
   }
 
 
   function roomJoined(room) {
-    var participants = [room.localParticipant]
+    var participants = []
+    if (room.localParticipant)
+      participants.push(room.localParticipant)
     room.participants.forEach(function(p) { participants.push(p) })
+
+    // // comment this out to see it w/o react
+    // // (in case that's what's setting the processor in a tizzy)
+    // var parent = document.querySelector("div")
+    // room.localParticipant.media.attach(parent)
+    // return true
 
     // currently state is always "mediaList", but if we were to keep going with this
     // we would want it to be able to pass in things like erorr states

@@ -5,8 +5,79 @@
     <title>Slackbot Videochat</title>
   </head>
 
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+  </style>
+
   <div id="root"></div>
+
+  <!-- pull it from public b/c it's broken on node w/ react -->
+  <!-- https://github.com/twilio/twilio-video.js/issues/28  -->
+  <script src="//media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
+
   <script src="/main.js"></script>
 
-  <script src="//media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
+  <script>
+  "use strict"
+
+  var roomName = "<%= @room_name %>" // TODO: This needs to be escaped
+  var token    = "<%= @token %>"
+
+  if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
+    // No dice
+    alert('WebRTC is not available in your browser.');
+  } else {
+    // Lets do it!
+    new Twilio.Video.Client(token)
+      .connect({to: roomName})
+      .then(roomJoined, function(e) { alert(e.toString()) })
+  }
+
+
+  function roomJoined(room) {
+    let participants = [room.localParticipant, ...room.participants]
+
+    // do we put them in the DOM here or do we pass them to react?
+    let state = { type: "mediaList", list: participants }
+    let appElement = React.createElement(App, { state: state, setFeatured: setFeatured })
+    const dom = ReactDOM.render(
+      appElement,
+      document.getElementById('root')
+    )
+
+    room.on('participantConnected', function(participant) {
+      // add to participants and rerender
+    })
+
+    room.on('participantDisconnected', function (participant) {
+      // instead, push this down into media,
+      // remove it from our participants list here and then render again
+      // participant.media.detach()
+    });
+
+    room.on('disconnected', function () {
+      // ideally do something nice here, realistically this was supposed to be a 4 hr project
+    })
+
+    window.addEventListener('beforeunload', function() {
+      // I thiiiiiink this is called when you leave the page, MDN docs don't tell you when unload is called,
+      // but they give an example that involves leaving a page:
+      // https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
+      //
+      // Not sure why we need to disconnect, maybe to differentiate it from an interrupted connection
+      // so that the other side dosn't think we might come back?
+      room.disconnect()
+    })
+
+    function setFeatured(participant) {
+      participants.forEach(p => p.featured = false)
+      participant.featured = true
+      dom.forceUpdate()
+    }
+  }
+  </script>
 </html>

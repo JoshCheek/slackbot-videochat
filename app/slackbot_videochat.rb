@@ -4,6 +4,9 @@ require 'digest/md5'
 require 'twilio-ruby'
 
 class SlackbotVideochat < Sinatra::Base
+  repo_root = File.expand_path '..', __dir__
+  set :public_folder, File.join(repo_root, 'public')
+
   # Whenever someone says 'videochat: username-to-chat-with'
   # Slack posts to this url (see test for keys)
   # I'm not sure where the docs are for more interesting responses -.-

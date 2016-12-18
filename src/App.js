@@ -41,11 +41,11 @@ class Media extends Component {
   render() {
     const participant = this.props.participant
     const url = participant.media.url
-    return <img
+
+    return <div
       className="Media"
-      alt={participant.identity}
-      src={url}
-      onClick={() => this.props.setFeatured(this.props.participant)}
+      ref={(div) => console.log({attachedTo: participant.media.attach(div)}) }
+      onClick={() => this.props.setFeatured(participant)}
     />
   }
 }

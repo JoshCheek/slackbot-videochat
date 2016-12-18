@@ -24,14 +24,13 @@
   <script>
   "use strict"
 
-  var roomName = "<%= @room_name %>" // TODO: This needs to be escaped
+  // TODO: This needs to be escaped
+  var roomName = "<%= @room_name %>"
   var token    = "<%= @token %>"
 
   if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
-    // No dice
     alert('WebRTC is not available in your browser.');
   } else {
-    // Lets do it!
     new Twilio.Video.Client(token)
       .connect({to: roomName})
       .then(roomJoined, function(e) { alert(e.toString()) })
@@ -41,11 +40,12 @@
   function roomJoined(room) {
     let participants = [room.localParticipant, ...room.participants]
 
-    // do we put them in the DOM here or do we pass them to react?
+    // currently state is always "mediaList", but if we were to keep going with this
+    // we would want it to be able to pass in things like erorr states
     let state = { type: "mediaList", list: participants }
-    let appElement = React.createElement(App, { state: state, setFeatured: setFeatured })
+
     const dom = ReactDOM.render(
-      appElement,
+      React.createElement(App, { state: state, setFeatured: setFeatured }), // equivalent to <App state={state} setFeatured={setFeatured} />
       document.getElementById('root')
     )
 

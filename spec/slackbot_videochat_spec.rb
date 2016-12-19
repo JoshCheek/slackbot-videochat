@@ -1,4 +1,80 @@
 require 'spec_helper'
+require 'slackbot_videochat'
+require 'add_keys'
+require 'add_timestamp'
+
+# The purpose is to support this interaction:
+#
+# ```
+# Jan: Hey, Mei, how did the client meeting go?
+# Mei: Too complicated to express in text, want to talk about it over lunch?
+# Jan: Can't, I'm WFH, videochat?
+# Mei: /videochat
+# Bot: @paddington invites you to videochat! (link)
+# ```
+#
+# They each click the link and wind up in a hangout/facetime-like video chat
+# where Mei and Jan sort out how to handle the client's situation.
+
+RSpec.describe 'POST /videochats' do
+  let(:internet) { TestInternetSession.new SlackbotVideochat }
+
+  def slack_params(overrides={})
+    { token:        "test-token",
+      team_id:      "test-team-id",
+      team_domain:  "test-team-domain",
+      channel_id:   "test-channel-id",
+      channel_name: "test-channel-name",
+      user_id:      "userid1",
+      user_name:    "username1",
+      text:         "",
+      command:      "/videochat",
+      response_url: "https://hooks.slack.com/commands/...",
+      **overrides
+    }
+  end
+
+  def extract_body(response)
+    expect(response).to be_successful
+    expect(response.content_type).to eq 'application/json'
+    JSON.parse response.body
+  end
+
+  def text(body)
+    body.fetch('attachments').fetch(0).fetch('text')
+  end
+
+  def url(body)
+    text(body).split.last
+  end
+
+  it 'replies to slack with a message saying who requested the videochat and providing the url' do
+    response = internet.post '/videochats', slack_params(user_id: 'U112233')
+    body     = extract_body response
+    expect(text body).to start_with '<@U112233>'
+    expect(text body).to include 'http://example.org/videochats'
+  end
+
+  describe 'Generating a videochat url' do
+    it 'is on the current host' do
+      response = internet.post('http://1.example.org/videochats', slack_params)
+      body     = extract_body response
+      expect(url body).to include 'http://1.example.org'
+
+      response = internet.post('http://2.example.org/videochats', slack_params)
+      body     = extract_body response
+      expect(url body).to include 'http://2.example.org/'
+    end
+
+    it 'uses a random endpoint' do
+      r1 = internet.post('/videochats', slack_params)
+      r2 = internet.post('/videochats', slack_params)
+      expect(r1.body).to_not eq r2.body
+    end
+  end
+end
+
+
 
 RSpec.describe 'GET /videochats/:room' do
 
@@ -11,13 +87,8 @@ RSpec.describe 'GET /videochats/:room' do
                time:              Time.new(2001,2,3,4,5,6)
              )
 
-    require 'slackbot_videochat'
     app = SlackbotVideochat
-
-    require 'add_keys'
     app = AddKeys.new(app, twilio: {account_sid: account_sid, api_key: api_key, api_secret: api_secret, configuration_sid: configuration_sid})
-
-    require 'add_timestamp'
     app = AddTimestamp.new app, double(Time, now: time)
     allow(Time).to receive(:now) { time } # Oof: https://github.com/twilio/twilio-ruby/blob/791f7880f23d1aa56927461fee8e6cb3d7034ce0/lib/twilio-ruby/util/access_token.rb#L26
 

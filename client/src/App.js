@@ -4,16 +4,13 @@ import './App.css'
 
 class App extends Component {
   render() {
-    const list     = this.props.state.list
-    const featured = list.find(p => p.featured) || list[0]
-    console.log({ featured: featured.identity })
     return <div className="App">
       <div className="FeaturedPanel">
-        <FeaturedMedia participant={featured} key={featured && featured.identity} />
+        <FeaturedMedia participant={this.props.featured} />
       </div>
       <div className="Separator" />
       <div className="ListPanel">
-        <MediaList participants={list} setFeatured={this.props.setFeatured}/>
+        <MediaList participants={this.props.list} setFeatured={this.props.setFeatured}/>
       </div>
     </div>
   }

@@ -64,10 +64,11 @@
 
 
   function roomJoined(room) {
+    var me           = room.localParticipant
     var participants = []
-    if (room.localParticipant)
-      participants.push(room.localParticipant)
+    if (me) participants.push(me)
     room.participants.forEach(function(p) { participants.push(p) })
+    var featured = participants[participants.length-1]
 
     console.log(`Participants: ${participants.length}`)
 
@@ -75,23 +76,31 @@
     // we would want it to be able to pass in things like erorr states
     var renderRoom = function() {
       console.log(participants.map(p => p.identity))
-      var state = { type: "mediaList", list: participants }
+      // equivalent to <App />
       ReactDOM.render(
-        React.createElement(App, { state: state, setFeatured: setFeatured }), // equivalent to <App state={state} setFeatured={setFeatured} />
+        React.createElement(App, {
+          list: participants,
+          featured: featured,
+          setFeatured: setFeatured
+        }),
         document.getElementById('root')
       )
     }
     renderRoom()
 
     room.on('participantConnected', function(participant) {
-      console.log(`Another participant: ${participant.identity}`)
+      console.log(`CONNECTED: ${participant.identity}`)
       participants.push(participant)
+      if(participants.length === 1)
+        featured = participant
       renderRoom()
     })
 
     room.on('participantDisconnected', function (participant) {
-      console.log(`Participant disconnected: ${participant.identity}`)
+      console.log(`DISCONNECTED: ${participant.identity}`)
       participants = participants.filter(function(p) { return p.identity !== participant.identity})
+      if(featured.identity === participant.identity)
+        featured = participants[participants.length-1]
       renderRoom()
 
       participant.media.detach() // push this down into media?
@@ -112,8 +121,7 @@
     })
 
     function setFeatured(participant) {
-      participants.forEach(p => p.featured = false)
-      participant.featured = true
+      featured = participant
       renderRoom()
     }
   }

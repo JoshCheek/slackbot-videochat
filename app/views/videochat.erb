@@ -5,9 +5,8 @@
 <script>
 "use strict"
 
-// TODO: This needs to be escaped
-var roomName = "<%= @room_name %>"
-var token    = "<%= @token %>"
+var roomName = <%= JSON.dump @room_name %>
+var token    = <%= JSON.dump @token %>
 var devmode  = <%= @devmode %>
 
 if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia)

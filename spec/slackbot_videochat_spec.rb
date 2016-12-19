@@ -100,7 +100,7 @@ RSpec.describe 'GET /videochats/:room' do
     allow(Time).to receive(:now) { time } # Oof: https://github.com/twilio/twilio-ruby/blob/791f7880f23d1aa56927461fee8e6cb3d7034ce0/lib/twilio-ruby/util/access_token.rb#L26
 
     session     = TestInternetSession.new app
-    response    = session.get "/videochats/#{room}"
+    response    = session.get "/videochats/#{ERB::Util.url_encode room}"
     assignments = response.body.scan(/^ *var *(\S+) *= *['"](.*)['"]$/)
     assignments.map { |key, value| [key.intern, value] }.to_h
   end
@@ -108,6 +108,11 @@ RSpec.describe 'GET /videochats/:room' do
   it 'gives the room name to the javascript so it can connect the users' do
     expect(js_vars(room:  'first')[:roomName]).to eq 'first'
     expect(js_vars(room: 'second')[:roomName]).to eq 'second'
+  end
+
+  it 'escapes the room name' do
+    vars = js_vars(room: '";alert("hi");"')
+    expect(vars[:roomName]).to eq '\\";alert(\\"hi\\");\\"'
   end
 
   context 'twilio token' do

@@ -39,22 +39,20 @@
     var me      = { identity: me, featured: false }
     var promise = null
 
-    // Maybe it's a bug in Opera, but even when I swap out and don't use Twilio at all,
-    // it shots my processor through the roof, even after I close the page :(
+    // I think it's a bug in Opera, it sends the processor up to 130%
+    // and they stay that way after I close the page :(
+    // This happens even when I swap Twilio out and use the APIs directly
     if (useTwilio) {
       me.media = new Twilio.Video.LocalMedia()
       promise  = Twilio.Video.getUserMedia().then(function(stream) {
         me.media.addStream(stream)
-        // me.media.pause() // For some reason, it's really taxing my processor, so pause it
       })
     } else {
       promise = navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(function(stream) {
         me.media = {attach: function(parent) {
           var video = document.createElement("video")
-          video.height = 100
           video.srcObject = stream
           parent.appendChild(video)
-          video.onloadedmetadata = function(e) { /* video.play() */ }
         }}
       })
     }
@@ -71,12 +69,6 @@
       participants.push(room.localParticipant)
     room.participants.forEach(function(p) { participants.push(p) })
 
-    // // comment this out to see it w/o react
-    // // (in case that's what's setting the processor in a tizzy)
-    // var parent = document.querySelector("div")
-    // room.localParticipant.media.attach(parent)
-    // return true
-
     // currently state is always "mediaList", but if we were to keep going with this
     // we would want it to be able to pass in things like erorr states
     var state = { type: "mediaList", list: participants }
@@ -87,13 +79,15 @@
     )
 
     room.on('participantConnected', function(participant) {
-      // add to participants and rerender
+      participant.push(participant)
+      dom.forceUpdate()
     })
 
     room.on('participantDisconnected', function (participant) {
-      // instead, push this down into media,
-      // remove it from our participants list here and then render again
-      // participant.media.detach()
+      participants = participants.filter(function(p) { return p.identity !== participant.identity})
+      dom.forceUpdate()
+
+      participant.media.detach() // push this down into media?
     });
 
     room.on('disconnected', function () {

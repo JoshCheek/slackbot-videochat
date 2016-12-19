@@ -1,25 +1,11 @@
-$LOAD_PATH.unshift('app', __dir__)
-require 'slackbot_videochat'
-
-class AddKeys
-  def initialize(app, keys)
-    @app  = app
-    @keys = keys
-  end
-
-  def call(env)
-    if env[:keys]
-      require "pry"
-      binding.pry
-    end
-    env[:keys] = @keys
-    @app.call(env)
-  end
-end
-
+root = File.expand_path __dir__
+$LOAD_PATH.unshift(File.join 'app')
+$LOAD_PATH.unshift(File.join 'lib')
 
 require 'dotenv'
 Dotenv.load
+
+require 'add_keys'
 use AddKeys, {
   twilio: {
     account_sid:       ENV['TWILIO_ACCOUNT_SID'],
@@ -29,4 +15,5 @@ use AddKeys, {
   }
 }
 
+require 'slackbot_videochat'
 run SlackbotVideochat

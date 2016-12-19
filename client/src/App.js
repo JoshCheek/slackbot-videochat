@@ -1,3 +1,4 @@
+// https://slackbot-videochat.herokuapp.com/videochats/token
 import React, { Component } from 'react'
 import './App.css'
 
@@ -5,9 +6,10 @@ class App extends Component {
   render() {
     const list     = this.props.state.list
     const featured = list.find(p => p.featured) || list[0]
+    console.log({ featured: featured.identity })
     return <div className="App">
       <div className="FeaturedPanel">
-        <FeaturedMedia participant={featured} />
+        <FeaturedMedia participant={featured} key={featured && featured.identity} />
       </div>
       <div className="Separator" />
       <div className="ListPanel">
@@ -18,6 +20,7 @@ class App extends Component {
 }
 
 
+// https://slackbot-videochat.herokuapp.com/videochats/token
 class FeaturedMedia extends Component {
   render() {
     let media

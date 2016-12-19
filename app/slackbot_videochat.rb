@@ -1,5 +1,4 @@
 require 'sinatra/base'
-require 'sinatra/json'
 require 'digest/md5'
 require 'twilio-ruby'
 
@@ -8,13 +7,15 @@ class SlackbotVideochat < Sinatra::Base
   # Slack posts to this url (see test for keys)
   # I'm not sure where the docs are for more interesting responses -.-
   post '/videochats' do
+    content_type :json
     url = File.join request.url, unique_token
-    json parse: 'full',
-         attachments: [
-           { text: "<@#{params[:user_id]}> invites you to <#{url}|videochat>!",
-             color: "#AAAA66",
-           }
-         ]
+    { parse: 'full',
+      attachments: [
+        { text: "<@#{params[:user_id]}> invites you to <#{url}|videochat>!",
+          color: "#AAAA66",
+        }
+      ]
+    }.to_json
   end
 
   get '/' do

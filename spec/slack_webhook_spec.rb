@@ -1,6 +1,5 @@
-$LOAD_PATH.unshift File.expand_path('../app', __dir__)
+require 'spec_helper'
 require 'slackbot_videochat'
-require 'rack/test'
 
 # The purpose is to support this interaction:
 #
@@ -14,10 +13,6 @@ require 'rack/test'
 #
 # They each click the link and wind up in a hangout/facetime-like video chat
 # where Mei and Jan sort out how to handle the client's situation.
-TestInternetSession = Struct.new :app do
-  include Rack::Test::Methods
-end
-
 RSpec.describe 'Slack webhook' do
   let(:internet) { TestInternetSession.new SlackbotVideochat }
 

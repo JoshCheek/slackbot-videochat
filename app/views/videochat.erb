@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <title>Slackbot Videochat</title>
-<link href="/main.css?cache=false" rel="stylesheet">
+<link href="/main.css<%= '?cache=false' if @devmode %>" rel="stylesheet">
 
 <div class="Conversation">
   <div class="You">
@@ -21,7 +21,7 @@
 // TODO: This needs to be escaped
 var roomName = "<%= @room_name %>"
 var token    = "<%= @token %>"
-var devmode  = ('dev' === roomName)
+var devmode  = <%= @devmode %>
 
 if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia)
   alert('WebRTC is not available in your browser.')

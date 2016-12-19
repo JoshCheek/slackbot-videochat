@@ -4,15 +4,17 @@ require 'digest/md5'
 require 'twilio-ruby'
 
 class SlackbotVideochat < Sinatra::Base
-
-  get('/') { redirect '/videochats/dev' } if ENV['RACK_ENV'] == 'development'
-
-  # Whenever someone says 'videochat: username-to-chat-with'
+  # Whenever someone says '/videochat'
   # Slack posts to this url (see test for keys)
   # I'm not sure where the docs are for more interesting responses -.-
   post '/videochats' do
     url = File.join request.url, unique_token
-    json text: "Chat at #{url}"
+    json parse: 'full',
+         attachments: [
+           { text: "<@#{params[:user_id]}> invites you to <#{url}|videochat>!",
+             color: "#AAAA66",
+           }
+         ]
   end
 
   get '/videochats/:room' do
@@ -33,17 +35,20 @@ class SlackbotVideochat < Sinatra::Base
     grant.configuration_profile_sid = key(:twilio, :configuration_sid)
     user.add_grant grant
 
-    @identity  = identity
     @room_name = params[:room]
+    @identity  = identity
     @token     = user.to_jwt
+    @devmode   = self.class.development? && ('dev' == params[:room])
 
     erb :videochat
   end
 
-  # unlikely to be unique b/c it's a hash of the timestamp down to nanoseconds
-  def unique_token
-    time = Time.new.strftime("%F%H%M%9N")
-    b64  = Digest::MD5.base64digest(time)
+  private
+
+  # likely to be unique b/c it's a hash of the timestamp down to nanoseconds
+  def unique_token(time=Time.now)
+    str = time.strftime("%F%H%M%9N")
+    b64 = Digest::MD5.base64digest(str)
     b64[0...-2] # remove trailing equal signs (they're ugly)
   end
 

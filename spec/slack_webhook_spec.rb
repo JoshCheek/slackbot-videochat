@@ -8,7 +8,7 @@ require 'rack/test'
 # Jan: Hey, Mei, how did the client meeting go?
 # Mei: Too complicated to express in text, want to talk about it over lunch?
 # Jan: Can't, I'm WFH, videochat?
-# Mei: videochat: Jan
+# Mei: /videochat
 # Bot: Chat at http://videochat.example.com/j8n3fo1
 # ```
 #
@@ -21,48 +21,51 @@ end
 RSpec.describe 'Slack webhook' do
   let(:internet) { TestInternetSession.new SlackbotVideochat }
 
-  def slack_params
+  def slack_params(overrides={})
     { token:        "test-token",
       team_id:      "test-team-id",
       team_domain:  "test-team-domain",
       channel_id:   "test-channel-id",
       channel_name: "test-channel-name",
       user_id:      "userid1",
-      timestamp:    '1355517523.000005',
       user_name:    "username1",
-      text:         "videochat: username2",
-      trigger_word: "videochat:",
+      text:         "",
+      command:      "/videochat",
+      response_url: "https://hooks.slack.com/commands/...",
+      **overrides
     }
   end
 
   def extract_body(response)
     expect(response).to be_successful
     expect(response.content_type).to eq 'application/json'
-    body = JSON.parse response.body
-    expect(body.keys).to eq ['text']
-    body
+    JSON.parse response.body
   end
 
-  # ideally a DM to each, but for now, just say it aloud
-  it 'replies to slack with a message for the users that tells them the url they can videochat at' do
-    # posted to us from Slack,  for slash commands, we get these two instead of trigger_word:
-    # {command: "videochat:", response_url: "https://hooks.slack.com/commands/idk/idk/idk"}
-    response = internet.post '/videochats', slack_params
+  def text(body)
+    body.fetch('attachments').fetch(0).fetch('text')
+  end
+
+  def url(body)
+    text(body).split.last
+  end
+
+  it 'replies to slack with a message saying who requested the videochat and providing the url' do
+    response = internet.post '/videochats', slack_params(user_id: 'U112233')
     body     = extract_body response
-    expect(body['text']).to start_with 'Chat at http://example.org/videochats'
+    expect(text body).to start_with '<@U112233>'
+    expect(text body).to include 'http://example.org/videochats'
   end
 
   describe 'Generating a videochat url' do
     it 'is on the current host' do
       response = internet.post('http://1.example.org/videochats', slack_params)
       body     = extract_body response
-      url      = body['text'].split.last
-      expect(url).to start_with 'http://1.example.org'
+      expect(url body).to include 'http://1.example.org'
 
       response = internet.post('http://2.example.org/videochats', slack_params)
       body     = extract_body response
-      url      = body['text'].split.last
-      expect(url).to start_with 'http://2.example.org'
+      expect(url body).to include 'http://2.example.org/'
     end
 
     it 'uses a random endpoint' do

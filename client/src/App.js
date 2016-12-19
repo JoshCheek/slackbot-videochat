@@ -41,7 +41,10 @@ class Media extends Component {
     const participant = this.props.participant
     return <div
       className="Media"
-      ref={(div) => participant.media.attach(div)}
+      ref={(div) => {
+        console.log(`${participant.identity} is attaching`)
+        participant.media.attach(div)
+      }}
       onClick={() => this.props.setFeatured(participant)}
     />
   }

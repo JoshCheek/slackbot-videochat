@@ -73,17 +73,21 @@
     // we would want it to be able to pass in things like erorr states
     var state = { type: "mediaList", list: participants }
 
+    console.log(`Participants: ${participants.length}`)
+
     var dom = ReactDOM.render(
       React.createElement(App, { state: state, setFeatured: setFeatured }), // equivalent to <App state={state} setFeatured={setFeatured} />
       document.getElementById('root')
     )
 
     room.on('participantConnected', function(participant) {
+      console.log(`Another participant: ${participant.identity}`)
       participants.push(participant)
       dom.forceUpdate()
     })
 
     room.on('participantDisconnected', function (participant) {
+      console.log(`Participant disconnected: ${participant.identity}`)
       participants = participants.filter(function(p) { return p.identity !== participant.identity})
       dom.forceUpdate()
 

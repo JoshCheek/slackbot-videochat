@@ -18,7 +18,7 @@ class SlackbotVideochat < Sinatra::Base
   end
 
   get '/' do
-    erb :structure
+    erb :main
   end
 
   get '/videochats/:room' do

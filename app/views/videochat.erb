@@ -28,9 +28,6 @@
   <script>
   "use strict"
 
-  // TODO: do those script tags execute asynchronously?
-  // this code might need to be in an "on dom ready" thing
-
   // TODO: This needs to be escaped
   var roomName = "<%= @room_name %>"
   var token    = "<%= @token %>"
@@ -39,80 +36,49 @@
   if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia)
     alert('WebRTC is not available in your browser.')
   else if (devmode)
-    mockRoom(true).then(roomJoined)
+    mockRoom().then(roomJoined)
   else
     new Twilio.Video.Client(token)
       .connect({to: roomName})
       .then(roomJoined, function(e) { alert(e.toString()) })
 
-  <%# http://01e5bd60.ngrok.io/videochats/token %>
-  function mockRoom(useTwilio) {
-    var noop    = function() {}
-    var me      = { identity: 'me', featured: false }
-    var promise = null
-
-    // I think it's a bug in Opera, it sends the processor up to 130%
-    // and they stay that way after I close the page :(
-    // This happens even when I swap Twilio out and use the APIs directly
-    if (useTwilio) {
-      me.media = new Twilio.Video.LocalMedia()
-      promise  = Twilio.Video.getUserMedia().then(function(stream) {
-        me.media.addStream(stream)
-      })
-    } else {
-      promise = navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(function(stream) {
-        me.media = {attach: function(parent) {
-          var video = document.createElement("video")
-          video.srcObject = stream
-          parent.appendChild(video)
-        }}
-      })
-    }
-
-    return promise.then(function() {
+  function mockRoom() {
+    var noop = function() {}
+    var me   = { identity: 'me', featured: false, media: new Twilio.Video.LocalMedia() }
+    return Twilio.Video.getUserMedia().then(function(stream) {
+      me.media.addStream(stream)
       return { participants: [], localParticipant: me, on: noop, disconnect: noop }
     })
   }
 
 
   function roomJoined(room) {
-    var me = room.localParticipant
-    var you;
-    window.me = me
-    room.participants.forEach(function(participant) {
-      you = participant
-    })
-    if(!you)
-      you = me
-
-    me.media.attach(document.querySelector('#me'))
-    if(you) {
-      console.log('you are already connected')
-      you.media.attach(document.querySelector('#you'))
+    function attach(participant, selector) {
+      participant.media.attach(document.querySelector(selector))
+      return participant
     }
 
+    var me = attach(room.localParticipant, '#me')
+
+    // room.participants is *NOT* an array >.<
+    var you
+    room.participants.forEach(function(participant) { you = participant })
+    devmode && !you && (you = me)
+    you && attach(you, '#you')
+
     room.on('participantConnected', function(participant) {
-      console.log('you connected')
-      you = participant
-      you.media.attach(document.querySelector('#you'))
+      you = attach(participant, '#you')
     })
 
     room.on('participantDisconnected', function (participant) {
-      console.log('you disconnected')
       participant.media.detach()
-    });
+    })
 
     room.on('disconnected', function () {
       // ideally do something nice here, realistically this was supposed to be a 4 hr project
     })
 
     window.addEventListener('beforeunload', function() {
-      // I thiiiiiink this is called when you leave the page, MDN docs don't tell you when unload is called,
-      // but they give an example that involves leaving a page:
-      // https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
-      //
-      // Not sure why we need to disconnect, maybe to differentiate it from an interrupted connection
-      // so that the other side dosn't think we might come back?
       room.disconnect()
     })
   }

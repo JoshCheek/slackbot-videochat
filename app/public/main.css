@@ -45,8 +45,11 @@ div {
   box-sizing: content-box;
   height: 100%;
 }
+.Media video {
+  height: 100%;
+}
 
-.App .Featured .Media {
+.App .Featured .Media video {
   box-shadow: 0 0 4em 0.5em #661;
   border: thin solid #995;
 }
@@ -76,7 +79,7 @@ div {
   text-align: center;
 }
 
-.App .List .Media {
+.App .List .Media video {
   height: 100%;
   border: thin solid rgba(102, 64, 32, 0.3);
 }

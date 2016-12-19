@@ -15,5 +15,8 @@ use AddKeys, {
   }
 }
 
+require 'add_timestamp'
+use AddTimestamp, Time
+
 require 'slackbot_videochat'
 run SlackbotVideochat

@@ -1,17 +1,4 @@
-<!DOCTYPE html>
-
-<title>Slackbot Videochat</title>
-<link href="/main.css<%= '?cache=false' if @devmode %>" rel="stylesheet">
-
-<div class="Conversation">
-  <div class="You">
-    <div class="Media"></div>
-  </div>
-  <hr />
-  <div class="Me">
-    <div class="Media"></div>
-  </div>
-</div>
+<%= erb :structure, layout: false %>
 
 <script src="//media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
 

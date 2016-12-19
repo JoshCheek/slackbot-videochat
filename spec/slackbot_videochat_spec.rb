@@ -16,6 +16,13 @@ require 'add_timestamp'
 # They each click the link and wind up in a hangout/facetime-like video chat
 # where Mei and Jan sort out how to handle the client's situation.
 
+RSpec.describe 'GET /' do
+  it 'renders the homepage' do
+    response = TestInternetSession.new(SlackbotVideochat).get('/')
+    expect(response).to be_ok
+  end
+end
+
 RSpec.describe 'POST /videochats' do
   let(:internet) { TestInternetSession.new SlackbotVideochat }
 

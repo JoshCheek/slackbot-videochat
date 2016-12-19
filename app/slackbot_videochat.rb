@@ -17,6 +17,10 @@ class SlackbotVideochat < Sinatra::Base
          ]
   end
 
+  get '/' do
+    erb :structure
+  end
+
   get '/videochats/:room' do
     # Ideally we could use their name from Slack
     # probably not possible, for now we'll just give them a random unique value

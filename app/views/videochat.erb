@@ -6,13 +6,24 @@
   </head>
 
   <link href="/main.css?cache=false" rel="stylesheet">
-  <div id="root"></div>
+
+  <div class="App">
+    <div class="FeaturedPanel">
+      <div class="Featured">
+        <div class="Media" id="you"></div>
+      </div>
+    </div>
+    <div class="Separator"></div>
+    <div class="ListPanel">
+      <div class="List">
+        <div class="Media" id="me"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- pull it from public b/c it's broken on node w/ react -->
   <!-- https://github.com/twilio/twilio-video.js/issues/28  -->
   <script src="//media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
-
-  <script src="/main.js?cache=false"></script>
 
   <script>
   "use strict"
@@ -64,36 +75,16 @@
 
 
   function roomJoined(room) {
-    var me           = room.localParticipant
-    var participants = []
-    if (me) participants.push(me)
-    room.participants.forEach(function(p) { participants.push(p) })
-    var featured = participants[participants.length-1]
+    var me  = room.localParticipant
+    var you = room.participants[0]
 
-    console.log(`Participants: ${participants.length}`)
-
-    // currently state is always "mediaList", but if we were to keep going with this
-    // we would want it to be able to pass in things like erorr states
-    var renderRoom = function() {
-      console.log(participants.map(p => p.identity))
-      // equivalent to <App />
-      ReactDOM.render(
-        React.createElement(App, {
-          list: participants,
-          featured: featured,
-          setFeatured: setFeatured
-        }),
-        document.getElementById('root')
-      )
-    }
-    renderRoom()
+    me.media.attach(document.querySelector('#me'))
+    if(you)
+      you.media.attach(document.querySelector('#you'))
 
     room.on('participantConnected', function(participant) {
       console.log(`CONNECTED: ${participant.identity}`)
-      participants.push(participant)
-      if(participants.length === 1)
-        featured = participant
-      renderRoom()
+      you.media.attach(document.querySelector('#you'))
     })
 
     room.on('participantDisconnected', function (participant) {
@@ -119,11 +110,6 @@
       // so that the other side dosn't think we might come back?
       room.disconnect()
     })
-
-    function setFeatured(participant) {
-      featured = participant
-      renderRoom()
-    }
   }
   </script>
 </html>

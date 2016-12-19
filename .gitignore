@@ -2,5 +2,3 @@
 tmp
 node_modules
 build
-app/public/main.js
-app/public/main.css

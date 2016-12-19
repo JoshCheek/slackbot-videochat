@@ -37,7 +37,7 @@
   var devmode  = ('dev' === roomName)
 
   if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia)
-    alert('WebRTC is not available in your browser.');
+    alert('WebRTC is not available in your browser.')
   else if (devmode)
     mockRoom(true).then(roomJoined)
   else
@@ -45,6 +45,7 @@
       .connect({to: roomName})
       .then(roomJoined, function(e) { alert(e.toString()) })
 
+  <%# http://01e5bd60.ngrok.io/videochats/token %>
   function mockRoom(useTwilio) {
     var noop    = function() {}
     var me      = { identity: 'me', featured: false }
@@ -75,25 +76,30 @@
 
 
   function roomJoined(room) {
-    var me  = room.localParticipant
-    var you = room.participants[0]
+    var me = room.localParticipant
+    var you;
+    window.me = me
+    room.participants.forEach(function(participant) {
+      you = participant
+    })
+    if(!you)
+      you = me
 
     me.media.attach(document.querySelector('#me'))
-    if(you)
+    if(you) {
+      console.log('you are already connected')
       you.media.attach(document.querySelector('#you'))
+    }
 
     room.on('participantConnected', function(participant) {
+      console.log('you connected')
       you = participant
       you.media.attach(document.querySelector('#you'))
     })
 
     room.on('participantDisconnected', function (participant) {
-      participants = participants.filter(function(p) { return p.identity !== participant.identity})
-      if(featured.identity === participant.identity)
-        featured = participants[participants.length-1]
-      renderRoom()
-
-      participant.media.detach() // push this down into media?
+      console.log('you disconnected')
+      participant.media.detach()
     });
 
     room.on('disconnected', function () {

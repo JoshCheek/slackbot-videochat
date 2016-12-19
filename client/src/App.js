@@ -6,7 +6,7 @@ class App extends Component {
   render() {
     return <div className="App">
       <div className="FeaturedPanel">
-        <FeaturedMedia participant={this.props.featured} />
+        <FeaturedMedia noCollision={new Date()} participant={this.props.featured} />
       </div>
       <div className="Separator" />
       <div className="ListPanel">

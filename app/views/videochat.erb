@@ -83,12 +83,11 @@
       you.media.attach(document.querySelector('#you'))
 
     room.on('participantConnected', function(participant) {
-      console.log(`CONNECTED: ${participant.identity}`)
+      you = participant
       you.media.attach(document.querySelector('#you'))
     })
 
     room.on('participantDisconnected', function (participant) {
-      console.log(`DISCONNECTED: ${participant.identity}`)
       participants = participants.filter(function(p) { return p.identity !== participant.identity})
       if(featured.identity === participant.identity)
         featured = participants[participants.length-1]

@@ -34,16 +34,16 @@ function roomJoined(room) {
     return participant
   }
 
-  var me = attach(room.localParticipant, '.Me .Media')
+  var me = attach(room.localParticipant, '.Secondary .Content')
 
   // NOTE: room.participants is *NOT* an array >.<
   var you
   room.participants.forEach(function(participant) { you = participant })
   devmode && !you && (you = me)
-  you && attach(you, '.You .Media')
+  you && attach(you, '.Primary .Content')
 
   room.on('participantConnected', function(participant) {
-    you = attach(participant, '.You .Media')
+    you = attach(participant, '.Primary .Content')
   })
 
   room.on('participantDisconnected', function (participant) {

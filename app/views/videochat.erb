@@ -1,86 +1,75 @@
 <!DOCTYPE html>
 
-<html lang="en">
-  <head>
-    <title>Slackbot Videochat</title>
-  </head>
+<title>Slackbot Videochat</title>
+<link href="/main.css?cache=false" rel="stylesheet">
 
-  <link href="/main.css?cache=false" rel="stylesheet">
-
-  <div class="App">
-    <div class="FeaturedPanel">
-      <div class="Featured">
-        <div class="Media" id="you"></div>
-      </div>
-    </div>
-    <div class="Separator"></div>
-    <div class="ListPanel">
-      <div class="List">
-        <div class="Media" id="me"></div>
-      </div>
-    </div>
+<div class="Conversation">
+  <div class="You">
+    <div class="Media"></div>
   </div>
+  <hr />
+  <div class="Me">
+    <div class="Media"></div>
+  </div>
+</div>
 
-  <!-- pull it from public b/c it's broken on node w/ react -->
-  <!-- https://github.com/twilio/twilio-video.js/issues/28  -->
-  <script src="//media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
+<script src="//media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
 
-  <script>
-  "use strict"
+<script>
+"use strict"
 
-  // TODO: This needs to be escaped
-  var roomName = "<%= @room_name %>"
-  var token    = "<%= @token %>"
-  var devmode  = ('dev' === roomName)
+// TODO: This needs to be escaped
+var roomName = "<%= @room_name %>"
+var token    = "<%= @token %>"
+var devmode  = ('dev' === roomName)
 
-  if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia)
-    alert('WebRTC is not available in your browser.')
-  else if (devmode)
-    mockRoom().then(roomJoined)
-  else
-    new Twilio.Video.Client(token)
-      .connect({to: roomName})
-      .then(roomJoined, function(e) { alert(e.toString()) })
+if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia)
+  alert('WebRTC is not available in your browser.')
+else if (devmode)
+  mockRoom().then(roomJoined)
+else
+  new Twilio.Video.Client(token)
+    .connect({to: roomName})
+    .then(roomJoined, function(e) { alert(e.toString()) })
 
-  function mockRoom() {
-    var noop = function() {}
-    var me   = { identity: 'me', featured: false, media: new Twilio.Video.LocalMedia() }
-    return Twilio.Video.getUserMedia().then(function(stream) {
-      me.media.addStream(stream)
-      return { participants: [], localParticipant: me, on: noop, disconnect: noop }
-    })
+function mockRoom() {
+  var noop = function() {}
+  var me   = { identity: 'me', featured: false, media: new Twilio.Video.LocalMedia() }
+  return Twilio.Video.getUserMedia().then(function(stream) {
+    me.media.addStream(stream)
+    return { participants: [], localParticipant: me, on: noop, disconnect: noop }
+  })
+}
+
+
+function roomJoined(room) {
+  function attach(participant, selector) {
+    participant.media.attach(document.querySelector(selector))
+    return participant
   }
 
+  var me = attach(room.localParticipant, '.Me .Media')
 
-  function roomJoined(room) {
-    function attach(participant, selector) {
-      participant.media.attach(document.querySelector(selector))
-      return participant
-    }
+  // NOTE: room.participants is *NOT* an array >.<
+  var you
+  room.participants.forEach(function(participant) { you = participant })
+  devmode && !you && (you = me)
+  you && attach(you, '.You .Media')
 
-    var me = attach(room.localParticipant, '#me')
+  room.on('participantConnected', function(participant) {
+    you = attach(participant, '.You .Media')
+  })
 
-    // room.participants is *NOT* an array >.<
-    var you
-    room.participants.forEach(function(participant) { you = participant })
-    devmode && !you && (you = me)
-    you && attach(you, '#you')
+  room.on('participantDisconnected', function (participant) {
+    participant.media.detach()
+  })
 
-    room.on('participantConnected', function(participant) {
-      you = attach(participant, '#you')
-    })
+  room.on('disconnected', function () {
+    // ideally do something nice here, realistically this was supposed to be a 4 hr project
+  })
 
-    room.on('participantDisconnected', function (participant) {
-      participant.media.detach()
-    })
-
-    room.on('disconnected', function () {
-      // ideally do something nice here, realistically this was supposed to be a 4 hr project
-    })
-
-    window.addEventListener('beforeunload', function() {
-      room.disconnect()
-    })
-  }
-  </script>
-</html>
+  window.addEventListener('beforeunload', function() {
+    room.disconnect()
+  })
+}
+</script>

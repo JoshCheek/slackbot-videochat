@@ -79,7 +79,7 @@
     )
 
     room.on('participantConnected', function(participant) {
-      participant.push(participant)
+      participants.push(participant)
       dom.forceUpdate()
     })
 

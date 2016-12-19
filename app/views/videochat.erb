@@ -69,27 +69,29 @@
       participants.push(room.localParticipant)
     room.participants.forEach(function(p) { participants.push(p) })
 
+    console.log(`Participants: ${participants.length}`)
+
     // currently state is always "mediaList", but if we were to keep going with this
     // we would want it to be able to pass in things like erorr states
     var state = { type: "mediaList", list: participants }
-
-    console.log(`Participants: ${participants.length}`)
-
-    var dom = ReactDOM.render(
-      React.createElement(App, { state: state, setFeatured: setFeatured }), // equivalent to <App state={state} setFeatured={setFeatured} />
-      document.getElementById('root')
-    )
+    var renderRoom = function() {
+      ReactDOM.render(
+        React.createElement(App, { state: state, setFeatured: setFeatured }), // equivalent to <App state={state} setFeatured={setFeatured} />
+        document.getElementById('root')
+      )
+    }
+    renderRoom()
 
     room.on('participantConnected', function(participant) {
       console.log(`Another participant: ${participant.identity}`)
       participants.push(participant)
-      dom.forceUpdate()
+      renderRoom()
     })
 
     room.on('participantDisconnected', function (participant) {
       console.log(`Participant disconnected: ${participant.identity}`)
       participants = participants.filter(function(p) { return p.identity !== participant.identity})
-      dom.forceUpdate()
+      renderRoom()
 
       participant.media.detach() // push this down into media?
     });
@@ -111,7 +113,7 @@
     function setFeatured(participant) {
       participants.forEach(p => p.featured = false)
       participant.featured = true
-      dom.forceUpdate()
+      renderRoom()
     }
   }
   </script>

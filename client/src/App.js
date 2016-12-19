@@ -37,14 +37,21 @@ class MediaList extends Component {
 }
 
 class Media extends Component {
+  componentDidMount() {
+    this.props.participant.media.attach(
+      this.refs.container
+    )
+  }
+
+  componentWillUnmount() {
+    this.props.participant.media.detach()
+  }
+
   render() {
     const participant = this.props.participant
     return <div
       className="Media"
-      ref={(div) => {
-        console.log(`${participant.identity} is attaching`)
-        participant.media.attach(div)
-      }}
+      ref="container"
       onClick={() => this.props.setFeatured(participant)}
     />
   }

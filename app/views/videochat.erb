@@ -36,7 +36,7 @@
 
   function mockRoom(useTwilio) {
     var noop    = function() {}
-    var me      = { identity: me, featured: false }
+    var me      = { identity: 'me', featured: false }
     var promise = null
 
     // I think it's a bug in Opera, it sends the processor up to 130%
@@ -73,8 +73,9 @@
 
     // currently state is always "mediaList", but if we were to keep going with this
     // we would want it to be able to pass in things like erorr states
-    var state = { type: "mediaList", list: participants }
     var renderRoom = function() {
+      console.log(participants.map(p => p.identity))
+      var state = { type: "mediaList", list: participants }
       ReactDOM.render(
         React.createElement(App, { state: state, setFeatured: setFeatured }), // equivalent to <App state={state} setFeatured={setFeatured} />
         document.getElementById('root')

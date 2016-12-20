@@ -24,19 +24,20 @@ var roomName = <%= JSON.dump @room_name %>
 var token    = <%= JSON.dump @token %>
 var devmode  = <%= @devmode %>
 
-if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia)
-  alert('WebRTC is not available in your browser.')
-else if (devmode)
-  mockRoom().then(roomJoined)
+if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
+  document.querySelector('.Primary   .Content').innerHTML = 'WebRTC is not available in your browser.'
+  document.querySelector('.Secondary .Content').innerHTML = ''
+} else if (devmode)
+  getMockRoom().then(roomJoined)
 else
   new Twilio.Video.Client(token)
-    .connect({to: roomName})
+    .connect({ to: roomName })
     .then(roomJoined, function(e) {
       // Not sure what triggers this, probably bad credentails
       document.querySelector('.Primary .Content').innerHTML = 'Error connecting'
     })
 
-function mockRoom() {
+function getMockRoom() {
   var noop = function() {}
   var me   = { identity: 'me', featured: false, media: new Twilio.Video.LocalMedia() }
   return Twilio.Video.getUserMedia().then(function(stream) {

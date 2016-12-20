@@ -39,8 +39,8 @@ Setup
 Where to take it with more time
 -------------------------------
 
-* Allow multiple users
-* Add mute and puase buttons
+* Allow multiple teams
+* Add mute and pause buttons
 * Allow users to request a suffix `/videochats lunch-n-learn` to get a more meaningful URL
   Deal with potential URL collision by namespacing videochats under the team
   (they submit a token you can use to identify which slack team sent the request)
@@ -48,7 +48,7 @@ Where to take it with more time
   (eg slash command is either only visible to the sender, or there is an awkward interaction
   where the command is visible to the channel, they designed it this way intentionally,
   but it feels very awkward)
-* Generalize the bot so you can use it from other services than just Slack.
+* Generalize the naming so you can use it from other services than just Slack.
 * Put React back in so that it can be tested
 * Fallback to voice if video is not supported.
 * Look into adding screensharing, I think I saw a web app do this once, so it's probably possible.

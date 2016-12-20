@@ -14,6 +14,7 @@ class SlackbotVideochat < Sinatra::Base
     content_type :json
     url = File.join request.url, unique_token
     JSON.dump parse: 'full',
+              response_type: "in_channel",
               attachments: [
                 { text: "<@#{params[:user_id]}> invites you to <#{url}|videochat>!",
                   color: "#AAAA66",

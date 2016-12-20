@@ -3,7 +3,7 @@ API Mashup!
 
 Initiate video chat (Twilio) from Slack.
 
-See it at [slackbot-videochat.herokuapp.com](slackbot-videochat.herokuapp.com)!
+**See it at [slackbot-videochat.herokuapp.com](https://slackbot-videochat.herokuapp.com/)!**
 
 NOTE: API here means "remote web service"
 ([here](list-of-apis.txt) is a list of possibilities).

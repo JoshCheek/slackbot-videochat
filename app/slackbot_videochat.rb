@@ -1,5 +1,4 @@
 require 'sinatra/base'
-require 'digest/md5'
 require 'twilio-ruby'
 
 class SlackbotVideochat < Sinatra::Base
@@ -32,11 +31,9 @@ class SlackbotVideochat < Sinatra::Base
 
   private
 
-  # likely to be unique b/c it's a hash of the timestamp down to nanoseconds
+  # Timestamp represented as base 36 (letters and digits)
   def unique_token(time=Time.now)
-    str = time.strftime("%F%H%M%9N")
-    b64 = Digest::MD5.base64digest(str)
-    b64[0...-2] # remove trailing equal signs (they're ugly)
+    time.strftime("%Y%m%d%H%M%9N").to_i.to_s(36)
   end
 
   def key(scope, name)

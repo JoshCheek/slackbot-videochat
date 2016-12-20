@@ -1,12 +1,11 @@
 task default: :test
 
-desc 'Build for deploy since Heroku makes it difficult to build there'
+desc 'Deploy code to prod'
 task deploy: :test do
-  sh 'git', 'push', '--force', 'heroku', 'master:master'
+  sh *%w'git push heroku master:master'
 end
 
 desc 'Test the Ruby code'
 task :test do
-  sh 'rspec', '--fail-fast', '--colour', '--format', 'documentation'
+  sh *%w'rspec --fail-fast --colour --format documentation'
 end
-

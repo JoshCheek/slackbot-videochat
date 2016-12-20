@@ -33,6 +33,8 @@ Setup
 * Install Bundler if you don't have it: `gem install bundler`
 * Install the gems: `bundle install`
 * Run the tests: `rake`
+* Get keys from Twilio, instructions are [here](https://github.com/TwilioDevEd/client-quickstart-ruby/blob/656c9f1134291bade83b1a5a30210e4de8213fda/README.md#twilio-client-quickstart-for-ruby)
+  place them into `.env`, like [this](https://github.com/TwilioDevEd/client-quickstart-ruby/blob/656c9f1134291bade83b1a5a30210e4de8213fda/.env.example)
 * Launch the dev server: `rake serve`
 
 

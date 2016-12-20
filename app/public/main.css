@@ -6,6 +6,7 @@
 
 body {
   font-family: sans-serif;
+  background:  #A86;
 }
 
 .Root {
@@ -14,12 +15,12 @@ body {
   height:   100%;
 }
 
-video, iframe {
+video {
   height:        100%;
   border-radius: 1em;
 }
 
-.Primary video, iframe {
+.Primary video {
   box-shadow: 0 0 4em 0.5em #661;
 }
 
@@ -56,7 +57,7 @@ hr:before {
 
 .Content {
   height:      100%;
-  font-size:   x-large;
+  font-size:   large;
   color:       white;
   line-height: 1.5em;
   font-weight: lighter;

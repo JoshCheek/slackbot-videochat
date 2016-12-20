@@ -7,25 +7,23 @@
 <div class="Root">
   <div class="Primary">
     <div class="Content">
-      <iframe
-         src="https://player.vimeo.com/video/193156327"
-         width="640"
-         height="400"
-         frameborder="0"
-         webkitallowfullscreen
-         mozallowfullscreen
-         allowfullscreen
-       ></iframe>
+      <video loop autoplay>
+        <source src="https://s3.amazonaws.com/josh.cheek/scratch/slackbot-videochat.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
     </div>
   </div>
 
   <hr />
+
   <div class="Secondary">
     <div class="Content">
+      <h2>To Integrate:</h2>
+
       <p>
-        In <a href="https://slack.com/">Slack</a>,
-        type <code>/videochat</code>.<br />
-        and follow the link!
+        <a href="https://yourteam.slack.com/apps/manage/custom-integrations">Configure</a> your Slack team to<br />
+        send a <code>POST</code> request<br />
+        to <code>https://slackbot-videochat.herokuapp.com/videochats</code><br />
       </p>
 
       <ul class="Links">

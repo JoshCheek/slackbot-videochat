@@ -5,11 +5,11 @@
 
 <div class="Root">
   <div class="Primary">
-    <div class="Content"></div>
+    <div class="Content"><p>waiting...</p></div>
   </div>
   <hr />
   <div class="Secondary">
-    <div class="Content"></div>
+    <div class="Content"><p>authorizing...</p></div>
   </div>
 </div>
 
@@ -29,7 +29,10 @@ else if (devmode)
 else
   new Twilio.Video.Client(token)
     .connect({to: roomName})
-    .then(roomJoined, function(e) { alert(e.toString()) })
+    .then(roomJoined, function(e) {
+      // Not sure what triggers this, probably bad credentails
+      document.querySelector('.Primary .Content').innerHTML = 'Error connecting'
+    })
 
 function mockRoom() {
   var noop = function() {}
@@ -43,7 +46,9 @@ function mockRoom() {
 
 function roomJoined(room) {
   function attach(participant, selector) {
-    participant.media.attach(document.querySelector(selector))
+    var parent = document.querySelector(selector)
+    parent.innerHTML = ""
+    participant.media.attach(parent)
     return participant
   }
 

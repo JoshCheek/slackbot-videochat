@@ -1,4 +1,4 @@
-app_path = File.expand_path '../app', __dir__
+app_path = File.realdirpath '../app', __dir__
 $LOAD_PATH.unshift app_path
 require 'videochat_app'
 require 'rack/test'

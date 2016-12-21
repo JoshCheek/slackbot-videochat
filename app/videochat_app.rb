@@ -28,5 +28,10 @@ class VideochatApp < Sinatra::Base
   end
 
 
+  get '/videochats/:room' do
+    @token     = "abc"
+    @room_name = params[:room]
+    erb :show_videochat
+  end
 
 end

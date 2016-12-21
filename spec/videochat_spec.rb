@@ -74,8 +74,30 @@ RSpec.describe 'VideochatApp' do
 
 
   describe 'when users follow a videochat link' do
-    it 'provides a twilio video token'
-    it 'gets the room name from the url'
+    def videochat_response(url: '/videochats/someroom')
+      get(url).tap { |response| expect(response).to be_ok }
+    end
+
+    def videochat_vars(**request_args)
+      videochat_response(**request_args)
+        .body.scan(/var *(.*?) *= *(.*?)$/)
+        .map { |name, value| [name.to_sym, value] }.to_h
+    end
+
+    it 'provides a twilio video token' do
+      expect(videochat_vars).to have_key :token
+    end
+
+    it 'gets the room name from the url' do
+      vars1 = videochat_vars(url: '/videochats/room1')
+      vars2 = videochat_vars(url: '/videochats/room2')
+      expect(vars1.fetch :roomName).to eq 'room1'
+      expect(vars2.fetch :roomName).to eq 'room2'
+    end
+
+    xit 'HTML escapes the room' do
+
+    end
 
     # Instructions to get keys are here:
     # https://github.com/TwilioDevEd/video-quickstart-ruby

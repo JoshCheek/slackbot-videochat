@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'twilio-ruby'
 require 'json'
 
 class VideochatApp < Sinatra::Base
@@ -29,7 +30,21 @@ class VideochatApp < Sinatra::Base
 
 
   get '/videochats/:room' do
-    @token     = "abc"
+    # Create an Access Token for Video usage
+    token = Twilio::Util::AccessToken.new(
+      'account_sid',
+      'api_key',
+      'api_secret',
+      3600,
+      'some identity'
+    )
+
+    # Grant access to Video
+    grant = Twilio::Util::AccessToken::VideoGrant.new
+    grant.configuration_profile_sid = 'configuration_sid'
+    token.add_grant grant
+
+    @token     = token.to_jwt
     @room_name = params[:room]
     erb :show_videochat
   end

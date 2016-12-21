@@ -103,12 +103,24 @@ RSpec.describe 'VideochatApp' do
 
     # Instructions to get keys are here:
     # https://github.com/TwilioDevEd/video-quickstart-ruby
-    describe 'the token' do
-      it 'depends on a unique identity (random value for now)'
-      it 'depends on the profile sid'
-      it 'depends on the account sid'
-      it 'depends on the api key'
-      it 'depends on the api secret'
+    specify 'the token grants video access and depends on a unique identity, profile sid, account sid, account key, account secret' do
+      escaped_token = videochat_vars[:token]
+      encoded_token = JSON.parse escaped_token, quirks_mode: true
+
+      # account secret
+      token = JWT.decode(encoded_token, 'api_secret').shift
+
+      # api key and account sid
+      expect(token.fetch 'iss').to eq 'api_key'
+      expect(token.fetch 'sub').to eq 'account_sid'
+
+      # depends on the user's identity
+      grants = token.fetch 'grants'
+      expect(grants.fetch 'identity').to eq 'some identity'
+
+      # video access and profile sid
+      expect(grants.fetch('video').fetch 'configuration_profile_sid')
+        .to eq 'configuration_sid'
     end
   end
 end

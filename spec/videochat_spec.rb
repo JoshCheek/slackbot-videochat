@@ -91,12 +91,14 @@ RSpec.describe 'VideochatApp' do
     it 'gets the room name from the url' do
       vars1 = videochat_vars(url: '/videochats/room1')
       vars2 = videochat_vars(url: '/videochats/room2')
-      expect(vars1.fetch :roomName).to eq 'room1'
-      expect(vars2.fetch :roomName).to eq 'room2'
+      expect(vars1.fetch :roomName).to eq '"room1"'
+      expect(vars2.fetch :roomName).to eq '"room2"'
     end
 
-    xit 'HTML escapes the room' do
-
+    it 'HTML escapes the room' do
+      room = Rack::Utils.escape '";alert("hi");"'
+      vars = videochat_vars(url: "/videochats/#{room}")
+      expect(vars.fetch :roomName).to eq '"\\";alert(\\"hi\\");\\""'
     end
 
     # Instructions to get keys are here:

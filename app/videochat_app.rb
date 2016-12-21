@@ -30,18 +30,20 @@ class VideochatApp < Sinatra::Base
 
 
   get '/videochats/:room' do
+    twilio_keys = env.fetch(:keys).fetch(:twilio)
+
     # Create an Access Token for Video usage
     token = Twilio::Util::AccessToken.new(
-      'account_sid',
-      'api_key',
-      'api_secret',
+      twilio_keys.fetch(:account_sid),
+      twilio_keys.fetch(:api_key),
+      twilio_keys.fetch(:api_secret),
       3600,
       'some identity'
     )
 
     # Grant access to Video
     grant = Twilio::Util::AccessToken::VideoGrant.new
-    grant.configuration_profile_sid = 'configuration_sid'
+    grant.configuration_profile_sid = twilio_keys.fetch(:configuration_sid)
     token.add_grant grant
 
     @token     = token.to_jwt

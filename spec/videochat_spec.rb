@@ -3,11 +3,32 @@ $LOAD_PATH.unshift app_path
 require 'videochat_app'
 require 'rack/test'
 
+class AddToEnv
+  def initialize(app, to_add)
+    @app, @to_add = app, to_add
+  end
+  def call(env)
+    env.merge! @to_add
+    @app.call(env)
+  end
+end
+
 RSpec.describe 'VideochatApp' do
   include Rack::Test::Methods
 
   def app
-    VideochatApp
+    AddToEnv.new VideochatApp, keys: @keys
+  end
+
+  before do
+    @keys = {
+      twilio: {
+        account_sid:       'xxxxx',
+        api_key:           'xxxxx',
+        api_secret:        'xxxxx',
+        configuration_sid: 'xxxxx',
+      }
+    }
   end
 
   describe 'when Slack POSTs to /videochats' do
@@ -104,15 +125,23 @@ RSpec.describe 'VideochatApp' do
     # Instructions to get keys are here:
     # https://github.com/TwilioDevEd/video-quickstart-ruby
     specify 'the token grants video access and depends on a unique identity, profile sid, account sid, account key, account secret' do
+      @keys = {
+        twilio: {
+          account_sid:       'test-account-sid',
+          api_key:           'test-api-key',
+          api_secret:        'test-api-secret',
+          configuration_sid: 'test-configuration-sid',
+        }
+      }
       escaped_token = videochat_vars[:token]
       encoded_token = JSON.parse escaped_token, quirks_mode: true
 
       # account secret
-      token = JWT.decode(encoded_token, 'api_secret').shift
+      token = JWT.decode(encoded_token, 'test-api-secret').shift
 
       # api key and account sid
-      expect(token.fetch 'iss').to eq 'api_key'
-      expect(token.fetch 'sub').to eq 'account_sid'
+      expect(token.fetch 'iss').to eq 'test-api-key'
+      expect(token.fetch 'sub').to eq 'test-account-sid'
 
       # depends on the user's identity
       grants = token.fetch 'grants'
@@ -120,7 +149,7 @@ RSpec.describe 'VideochatApp' do
 
       # video access and profile sid
       expect(grants.fetch('video').fetch 'configuration_profile_sid')
-        .to eq 'configuration_sid'
+        .to eq 'test-configuration-sid'
     end
   end
 end

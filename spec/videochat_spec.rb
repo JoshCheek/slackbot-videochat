@@ -11,7 +11,7 @@ RSpec.describe 'VideochatApp' do
   end
 
   describe 'when Slack POSTs to /videochats' do
-    it 'responds with a link to a url that the users can videochat' do
+    def slack_response
       from_slack = {
         token:         "Z4n2e1acd0Iu7jkiHx0Ng21L",
         team_id:       "T3BS49M8A",
@@ -24,14 +24,21 @@ RSpec.describe 'VideochatApp' do
         text:          "",
         response_url:  "https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT3BS49M8A%2F119906407301%2FNr4MLEysnZyEGWGscNSpuljZ",
       }
+      post '/videochats', from_slack
+    end
 
-      response = post '/videochats', from_slack
 
+    it 'responds with a link to a url that the users can videochat' do
+      response = slack_response
       expect(response).to be_ok
       expect(response.body).to include "<@UJOSHUSERID> has invided you to <http://example.org/videochats/"
     end
 
-    it 'responds with valid JSON'
+    it 'responds with valid JSON' do
+      response = slack_response
+      expect(response.content_type).to eq 'application/json'
+      expect(JSON.parse response.body).to be_a_kind_of Hash
+    end
 
     describe 'the videochat link' do
       it 'is on the app\'s host'

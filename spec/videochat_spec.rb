@@ -31,7 +31,7 @@ RSpec.describe 'VideochatApp' do
     it 'responds with a link to a url that the users can videochat' do
       response = slack_response
       expect(response).to be_ok
-      expect(response.body).to include "<@UJOSHUSERID> has invided you to <http://example.org/videochats/"
+      expect(response.body).to include "<@UJOSHUSERID> has invited you to <http://example.org/videochats/"
     end
 
     it 'responds with valid JSON' do
@@ -45,8 +45,8 @@ RSpec.describe 'VideochatApp' do
         response1 = slack_response url: 'http://example.org/videochats'
         response2 = slack_response url: 'http://subdomain.example.com/videochats'
 
-        expect(response1.body).to include "invided you to <http://example.org/videochats/"
-        expect(response2.body).to include "invided you to <http://subdomain.example.com/videochats/"
+        expect(response1.body).to include "invited you to <http://example.org/videochats/"
+        expect(response2.body).to include "invited you to <http://subdomain.example.com/videochats/"
       end
 
 
@@ -54,8 +54,8 @@ RSpec.describe 'VideochatApp' do
         response1 = slack_response url: 'http://example.org/videochats'
         response2 = slack_response url: 'https://example.org/videochats'
 
-        expect(response1.body).to include "invided you to <http://example.org/videochats/"
-        expect(response2.body).to include "invided you to <https://example.org/videochats/"
+        expect(response1.body).to include "invited you to <http://example.org/videochats/"
+        expect(response2.body).to include "invited you to <https://example.org/videochats/"
       end
 
       it 'is a unique room name so that users don\'t all wind up in the same chat' do

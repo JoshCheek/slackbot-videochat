@@ -21,9 +21,12 @@ class VideochatApp < Sinatra::Base
     content_type 'json'
     JSON.dump response_type: "in_channel",
               attachments: [
-                { text:  "<@#{params[:user_id]}> has invided you to <#{url}|videochat>",
+                { text:  "<@#{params[:user_id]}> has invited you to <#{url}|videochat>",
                   color: "#A7C262",
                 }
               ]
   end
+
+
+
 end

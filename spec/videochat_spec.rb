@@ -43,13 +43,21 @@ RSpec.describe 'VideochatApp' do
     describe 'the videochat link' do
       it 'is on the app\'s host' do
         response1 = slack_response url: 'http://example.org/videochats'
-        expect(response1.body).to include "invided you to <http://example.org/videochats/"
-
         response2 = slack_response url: 'http://subdomain.example.com/videochats'
+
+        expect(response1.body).to include "invided you to <http://example.org/videochats/"
         expect(response2.body).to include "invided you to <http://subdomain.example.com/videochats/"
       end
 
-      it 'respects the scheme'
+
+      it 'respects the scheme' do
+        response1 = slack_response url: 'http://example.org/videochats'
+        response2 = slack_response url: 'https://example.org/videochats'
+
+        expect(response1.body).to include "invided you to <http://example.org/videochats/"
+        expect(response2.body).to include "invided you to <https://example.org/videochats/"
+      end
+
       it 'is a unique url so that users don\'t all wind up in the same chat'
     end
   end

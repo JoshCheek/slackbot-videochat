@@ -2,22 +2,13 @@ app_path = File.realdirpath '../app', __dir__
 $LOAD_PATH.unshift app_path
 require 'videochat_app'
 require 'rack/test'
-
-class AddToEnv
-  def initialize(app, to_add)
-    @app, @to_add = app, to_add
-  end
-  def call(env)
-    env.merge! @to_add
-    @app.call(env)
-  end
-end
+require 'middleware'
 
 RSpec.describe 'VideochatApp' do
   include Rack::Test::Methods
 
   def app
-    AddToEnv.new VideochatApp, keys: @keys
+    Middleware::AddToEnv.new VideochatApp, keys: @keys
   end
 
   before do

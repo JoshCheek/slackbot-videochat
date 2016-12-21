@@ -58,7 +58,17 @@ RSpec.describe 'VideochatApp' do
         expect(response2.body).to include "invided you to <https://example.org/videochats/"
       end
 
-      it 'is a unique url so that users don\'t all wind up in the same chat'
+      it 'is a unique room name so that users don\'t all wind up in the same chat' do
+        link1 = slack_response.body.scan(/<http.*?>/)
+        link2 = slack_response.body.scan(/<http.*?>/)
+        expect(link1).to_not eq link2
+      end
+
+      it 'does not have slashes in the room name' do
+        link = slack_response.body[/<http.*?>/]
+        room = link[/videochats\/(.*)\|/, 1]
+        expect(room).to_not include '/'
+      end
     end
   end
 

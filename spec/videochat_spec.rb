@@ -11,7 +11,7 @@ RSpec.describe 'VideochatApp' do
   end
 
   describe 'when Slack POSTs to /videochats' do
-    def slack_response
+    def slack_response(url: '/videochats')
       from_slack = {
         token:         "Z4n2e1acd0Iu7jkiHx0Ng21L",
         team_id:       "T3BS49M8A",
@@ -24,7 +24,7 @@ RSpec.describe 'VideochatApp' do
         text:          "",
         response_url:  "https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT3BS49M8A%2F119906407301%2FNr4MLEysnZyEGWGscNSpuljZ",
       }
-      post '/videochats', from_slack
+      post url, from_slack
     end
 
 
@@ -41,7 +41,14 @@ RSpec.describe 'VideochatApp' do
     end
 
     describe 'the videochat link' do
-      it 'is on the app\'s host'
+      it 'is on the app\'s host' do
+        response1 = slack_response url: 'http://example.org/videochats'
+        expect(response1.body).to include "invided you to <http://example.org/videochats/"
+
+        response2 = slack_response url: 'http://subdomain.example.com/videochats'
+        expect(response2.body).to include "invided you to <http://subdomain.example.com/videochats/"
+      end
+
       it 'respects the scheme'
       it 'is a unique url so that users don\'t all wind up in the same chat'
     end

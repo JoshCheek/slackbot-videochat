@@ -136,7 +136,7 @@ RSpec.describe 'VideochatApp' do
 
       # depends on the user's identity
       grants = token.fetch 'grants'
-      expect(grants.fetch 'identity').to eq 'some identity'
+      expect(grants.fetch 'identity').to match /^[0-9a-f]+$/i
 
       # video access and profile sid
       expect(grants.fetch('video').fetch 'configuration_profile_sid')

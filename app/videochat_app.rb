@@ -17,8 +17,7 @@ class VideochatApp < Sinatra::Base
   #
   #   token=Z4n2e1acd0Iu7jkiHx0Ng21L&team_id=T3BS49M8A&team_domain=module5&channel_id=C3FDDV63V&channel_name=josh-testing&user_id=U3G2NE4MC&user_name=paddington&command=%2Fvc2&text=&response_url=https%3A%2F%2Fhooks.slack.com%2Fcommands%2FT3BS49M8A%2F119906407301%2FNr4MLEysnZyEGWGscNSpuljZ
   post '/videochats' do
-    room = 10.times.map { rand(16).to_s(16) }.join
-    url  = File.join request.base_url, 'videochats', room
+    url  = File.join request.base_url, 'videochats', random_token
     content_type 'json'
     JSON.dump response_type: "in_channel",
               attachments: [
@@ -38,7 +37,7 @@ class VideochatApp < Sinatra::Base
       twilio_keys.fetch(:api_key),
       twilio_keys.fetch(:api_secret),
       3600,
-      'some identity'
+      random_token, # unique identity
     )
 
     # Grant access to Video
@@ -51,4 +50,7 @@ class VideochatApp < Sinatra::Base
     erb :show_videochat
   end
 
+  private def random_token
+    10.times.map { rand(16).to_s(16) }.join
+  end
 end

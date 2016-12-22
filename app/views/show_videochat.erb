@@ -1,4 +1,38 @@
+<!doctype>
+
+<title>Videochat!</title>
+<div id="videos"></div>
+
+<script src="//media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
+
 <script>
 var token    = <%= JSON.dump @token %>
 var roomName = <%= JSON.dump @room_name %>
+
+if (!navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
+  alert('WebRTC is not available in your browser.')
+} else {
+  new Twilio.Video.Client(token)
+    .connect({to: roomName})
+    .then(roomJoined, function(error) { alert('Could not connect to Twilio: ' + error.message) })
+
+  function roomJoined(room) {
+    function attach(participant) { participant.media.attach('#videos') }
+    function detach(participant) { participant.media.detach() }
+
+    // attachments
+    room.participants.forEach(attach)       // people already in the room
+    attach(room.localParticipant)           // me
+    room.on('participantConnected', attach) // people who join after me
+
+    // detachments
+    room.on('participantDisconnected', detach)
+    room.on('disconnected', function () {
+      detach(room.localParticipant)
+      room.participants.forEach(detach)
+    })
+
+    window.addEventListener('beforeunload', function() { room.disconnect() })
+  }
+}
 </script>
